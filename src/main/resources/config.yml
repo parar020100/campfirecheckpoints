@@ -1,0 +1,36 @@
+# src/main/resources/config.yml
+# ================================
+# Campfire Checkpoints Configuration
+# ================================
+
+# The maximum radius (in blocks) for checkpoint operations:
+# - When setting a checkpoint, checks for existing ones within this radius
+# - When respawning, finds the closest checkpoint within this radius of death
+radius: 500
+
+# If true, the campfire will be extinguished after a player respawns at it.
+# The player must re-light it with Flint & Steel to use it again.
+extinguish-on-respawn: true
+
+# The sound played when a checkpoint is successfully set.
+# Valid sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+sound-on-set: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
+
+# Time in seconds that players have to confirm overriding an existing checkpoint
+# When a player tries to set a checkpoint within radius of an existing one,
+# they must right-click again within this time to confirm
+override-confirmation-timeout: 5
+
+# Maximum number of checkpoints a player can have (0 = unlimited)
+# If a player reaches this limit, they must delete old checkpoints before creating new ones
+max-checkpoints-per-player: 0
+
+# Priority when both bed spawn and campfire checkpoint are available within radius
+# Options:
+#   "checkpoint" - Campfire checkpoint always takes priority over bed (default)
+#   "bed"        - Bed spawn always takes priority over checkpoint
+#   "closest"    - Whichever is closer to the death location takes priority
+#
+# Note: This only applies when BOTH a valid bed spawn AND a lit checkpoint
+#       are within the configured radius of the death location.
+respawn-priority: checkpoint
