@@ -65,7 +65,7 @@ public final class CheckpointManager {
 
         try (FileReader reader = new FileReader(dataFile)) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-            
+
             if (root.has("checkpoints")) {
                 JsonArray checkpointsArray = root.getAsJsonArray("checkpoints");
                 int loaded = 0;
@@ -102,7 +102,7 @@ public final class CheckpointManager {
             if (saveTask != null && !saveTask.isCancelled()) {
                 saveTask.cancel();
             }
-            
+
             saveTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                 if (dirty.compareAndSet(true, false)) {
                     saveCheckpointsInternal();
@@ -115,7 +115,7 @@ public final class CheckpointManager {
         if (saveTask != null && !saveTask.isCancelled()) {
             saveTask.cancel();
         }
-        
+
 
         if (dirty.get()) {
             saveCheckpointsInternal();
@@ -201,7 +201,7 @@ public final class CheckpointManager {
         if (checkpoints == null) {
             return false;
         }
-        
+
         Checkpoint removed;
         synchronized (checkpoints) {
             if (index < 0 || index >= checkpoints.size()) {
@@ -212,7 +212,7 @@ public final class CheckpointManager {
                 playerCheckpoints.remove(playerUUID);
             }
         }
-        
+
         if (removed != null) {
             locationIndex.remove(removed.getLocationKey());
         }
@@ -223,7 +223,7 @@ public final class CheckpointManager {
     public @Nullable Checkpoint removeCheckpointAt(@NotNull Location location) {
         String locationKey = createLocationKey(location);
         Checkpoint checkpoint = locationIndex.remove(locationKey);
-        
+
         if (checkpoint != null) {
             List<Checkpoint> checkpoints = playerCheckpoints.get(checkpoint.getOwnerUUID());
             if (checkpoints != null) {
@@ -236,7 +236,7 @@ public final class CheckpointManager {
             }
             markDirty();
         }
-        
+
         return checkpoint;
     }
 
@@ -354,7 +354,7 @@ public final class CheckpointManager {
             }
             locationIndex.remove(pending.toOverride.getLocationKey());
         }
-        
+
         // Add new checkpoint
         Checkpoint newCheckpoint = new Checkpoint(playerUUID, pending.newLocation);
         addCheckpoint(playerUUID, newCheckpoint);
@@ -367,7 +367,7 @@ public final class CheckpointManager {
             if (pending == null) {
                 return false;
             }
-            
+
             long timeout = plugin.getConfigManager().getOverrideConfirmationTimeoutMillis();
             if (System.currentTimeMillis() - pending.timestamp > timeout) {
                 pendingOverrides.remove(playerUUID);
@@ -386,7 +386,7 @@ public final class CheckpointManager {
             if (pending == null) {
                 return null;
             }
-            
+
             long timeout = plugin.getConfigManager().getOverrideConfirmationTimeoutMillis();
             if (System.currentTimeMillis() - pending.timestamp > timeout) {
                 pendingOverrides.remove(playerUUID);

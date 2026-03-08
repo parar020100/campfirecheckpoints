@@ -6,17 +6,17 @@ import org.jetbrains.annotations.Nullable;
 
 
 public enum RespawnPriority {
-    
+
     /**
      * Campfire checkpoint always takes priority over bed
      */
     CHECKPOINT("checkpoint"),
-    
+
     /**
      * Bed spawn always takes priority over checkpoint
      */
     BED("bed"),
-    
+
     /**
      * Whichever is closer to the death location takes priority
      */
@@ -37,14 +37,14 @@ public enum RespawnPriority {
         if (value == null) {
             return CHECKPOINT;
         }
-        
+
         String lowercaseValue = value.toLowerCase().trim();
         for (RespawnPriority priority : values()) {
             if (priority.configValue.equals(lowercaseValue)) {
                 return priority;
             }
         }
-        
+
         return CHECKPOINT;
     }
 

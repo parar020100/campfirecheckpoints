@@ -12,7 +12,7 @@ import java.util.logging.Level;
 public final class ConfigManager {
 
     private final @NotNull CampfireCheckpoints plugin;
-    
+
     // Cached config values
     private int radius;
     private boolean extinguishOnRespawn;

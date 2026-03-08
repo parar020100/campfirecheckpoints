@@ -59,7 +59,7 @@ public final class CheckpointListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        
+
         if (!player.hasPermission("campfirecheckpoints.use")) {
             return;
         }
@@ -80,7 +80,7 @@ public final class CheckpointListener implements Listener {
 
         UUID playerUUID = player.getUniqueId();
         Location blockLocation = clickedBlock.getLocation();
-        
+
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
         ConfigManager configManager = plugin.getConfigManager();
 
@@ -109,7 +109,7 @@ public final class CheckpointListener implements Listener {
                 String.format("(%d, %d, %d)", existingLoc.getBlockX(), 
                     existingLoc.getBlockY(), existingLoc.getBlockZ()) : 
                 "(unknown)";
-            
+
             int timeout = configManager.getOverrideConfirmationTimeout();
             MessageUtil.send(player, "&cWarning: &eYou have a checkpoint at " + existingCoords + 
                 " within " + radius + " blocks!");
@@ -153,7 +153,7 @@ public final class CheckpointListener implements Listener {
     private void playCheckpointEffects(@NotNull Player player, @NotNull Location location) {
         ConfigManager configManager = plugin.getConfigManager();
         World world = location.getWorld();
-        
+
         if (world == null) {
             return;
         }
@@ -188,7 +188,7 @@ public final class CheckpointListener implements Listener {
     public void onPlayerDeath(@NotNull PlayerDeathEvent event) {
         Player player = event.getEntity();
         Location deathLoc = player.getLocation();
-        
+
         if (deathLoc.getWorld() != null) {
             deathLocations.put(player.getUniqueId(), deathLoc.clone());
         }
@@ -198,7 +198,7 @@ public final class CheckpointListener implements Listener {
     public void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
-        
+
         Location deathLocation = deathLocations.remove(playerUUID);
         if (deathLocation == null) {
             return;
@@ -206,12 +206,12 @@ public final class CheckpointListener implements Listener {
 
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
         ConfigManager configManager = plugin.getConfigManager();
-        
+
         Checkpoint closestCheckpoint = checkpointManager.findClosestCheckpoint(playerUUID, deathLocation);
-        
+
         Location bedSpawn = player.getRespawnLocation();
         boolean hasBedSpawn = bedSpawn != null && event.isBedSpawn();
-        
+
         RespawnResult respawnResult = determineRespawnLocation(
             closestCheckpoint, 
             bedSpawn, 
@@ -220,7 +220,7 @@ public final class CheckpointListener implements Listener {
             configManager.getRespawnPriority(),
             configManager.getRadius()
         );
-        
+
         if (respawnResult == null || respawnResult.location == null) {
             // No valid respawn location, let vanilla handle it
             return;
@@ -235,7 +235,7 @@ public final class CheckpointListener implements Listener {
         final boolean usedCheckpoint = respawnResult.isCheckpoint;
         final boolean usedBed = respawnResult.isBed;
         final boolean extinguished = respawnResult.isCheckpoint && configManager.isExtinguishOnRespawn();
-        
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 if (usedCheckpoint) {
@@ -259,39 +259,39 @@ public final class CheckpointListener implements Listener {
             @NotNull Location deathLocation,
             @NotNull RespawnPriority priority,
             double radius) {
-        
+
         // Get checkpoint spawn location if available
         Location checkpointSpawn = null;
         boolean hasValidCheckpoint = false;
-        
+
         if (checkpoint != null) {
             checkpointSpawn = checkpoint.getSpawnLocation();
             hasValidCheckpoint = checkpointSpawn != null && checkpointSpawn.getWorld() != null;
         }
-        
+
         // If neither is available, return null
         if (!hasValidCheckpoint && !hasBedSpawn) {
             return null;
         }
-        
+
         // If only checkpoint is available
         if (hasValidCheckpoint && !hasBedSpawn) {
             return new RespawnResult(checkpointSpawn, true, false, checkpoint);
         }
-        
+
         // If only bed is available
         if (!hasValidCheckpoint && hasBedSpawn) {
             return new RespawnResult(bedSpawn, false, true, null);
         }
-        
+
         // Both are available - use priority setting
         switch (priority) {
             case CHECKPOINT:
                 return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-                
+
             case BED:
                 return new RespawnResult(bedSpawn, false, true, null);
-                
+
             case CLOSEST:
                 return determineClosestRespawn(
                     checkpoint, checkpointSpawn, 
@@ -299,7 +299,7 @@ public final class CheckpointListener implements Listener {
                     deathLocation, 
                     radius
                 );
-                
+
             default:
                 return new RespawnResult(checkpointSpawn, true, false, checkpoint);
         }
@@ -314,25 +314,25 @@ public final class CheckpointListener implements Listener {
             @NotNull Location bedSpawn,
             @NotNull Location deathLocation,
             double radius) {
-        
+
         double checkpointDistSq = checkpoint.distanceSquared(deathLocation);
         double bedDistSq = calculateDistanceSquared(bedSpawn, deathLocation);
-        
+
         // Check if bed is in a different world
         if (bedSpawn.getWorld() == null || !bedSpawn.getWorld().equals(deathLocation.getWorld())) {
             // Bed is in different world, use checkpoint
             return new RespawnResult(checkpointSpawn, true, false, checkpoint);
         }
-        
+
         // Check if bed is within radius
         double radiusSquared = radius * radius;
         boolean bedWithinRadius = bedDistSq <= radiusSquared;
-        
+
         // If bed is not within radius, use checkpoint
         if (!bedWithinRadius) {
             return new RespawnResult(checkpointSpawn, true, false, checkpoint);
         }
-        
+
         // Both are within radius, use the closer one
         if (checkpointDistSq <= bedDistSq) {
             return new RespawnResult(checkpointSpawn, true, false, checkpoint);
@@ -348,7 +348,7 @@ public final class CheckpointListener implements Listener {
         if (!a.getWorld().equals(b.getWorld())) {
             return Double.MAX_VALUE;
         }
-        
+
         double dx = a.getX() - b.getX();
         double dy = a.getY() - b.getY();
         double dz = a.getZ() - b.getZ();
@@ -359,13 +359,13 @@ public final class CheckpointListener implements Listener {
             @NotNull Checkpoint checkpoint,
             @NotNull CheckpointManager checkpointManager,
             @NotNull ConfigManager configManager) {
-        
+
         if (configManager.isExtinguishOnRespawn()) {
             Location blockLoc = checkpoint.getBlockLocation();
             if (blockLoc != null && blockLoc.getWorld() != null) {
                 Block campfireBlock = blockLoc.getBlock();
                 BlockData blockData = campfireBlock.getBlockData();
-                
+
                 if (blockData instanceof Lightable lightable) {
                     lightable.setLit(false);
                     campfireBlock.setBlockData(lightable);
@@ -380,7 +380,7 @@ public final class CheckpointListener implements Listener {
         final boolean isCheckpoint;
         final boolean isBed;
         final @Nullable Checkpoint checkpoint;
-        
+
         RespawnResult(@Nullable Location location, boolean isCheckpoint, boolean isBed, 
                       @Nullable Checkpoint checkpoint) {
             this.location = location;
@@ -401,16 +401,16 @@ public final class CheckpointListener implements Listener {
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
         Block block = event.getBlock();
         Material type = block.getType();
-        
+
         if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
             return;
         }
 
         Location blockLocation = block.getLocation();
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
-        
+
         Checkpoint checkpoint = checkpointManager.removeCheckpointAt(blockLocation);
-        
+
         if (checkpoint != null) {
             Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
             if (owner != null && owner.isOnline()) {
@@ -419,7 +419,7 @@ public final class CheckpointListener implements Listener {
                     blockLocation.getBlockY() + ", " + 
                     blockLocation.getBlockZ() + ") &chas been destroyed!");
             }
-            
+
             Player breaker = event.getPlayer();
             if (!breaker.getUniqueId().equals(checkpoint.getOwnerUUID())) {
                 MessageUtil.send(breaker, "&7You destroyed a checkpoint belonging to another player.");
@@ -432,7 +432,7 @@ public final class CheckpointListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        
+
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) {
             return;
@@ -445,7 +445,7 @@ public final class CheckpointListener implements Listener {
 
         Player player = event.getPlayer();
         Material itemInHand = player.getInventory().getItemInMainHand().getType();
-        
+
         if (!isShovel(itemInHand) && itemInHand != Material.WATER_BUCKET) {
             return;
         }
@@ -459,13 +459,13 @@ public final class CheckpointListener implements Listener {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Block block = blockLoc.getBlock();
             BlockData newBlockData = block.getBlockData();
-            
+
             if (newBlockData instanceof Lightable newLightable && !newLightable.isLit()) {
                 Checkpoint checkpoint = plugin.getCheckpointManager().getCheckpointAt(blockLoc);
                 if (checkpoint != null && checkpoint.isLit()) {
                     checkpoint.setLit(false);
                     plugin.getCheckpointManager().setCheckpointLit(checkpoint, false);
-                    
+
                     Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
                     if (owner != null && owner.isOnline()) {
                         MessageUtil.send(owner, "&eYour campfire checkpoint at &f(" + 
@@ -483,7 +483,7 @@ public final class CheckpointListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        
+
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) {
             return;
@@ -496,7 +496,7 @@ public final class CheckpointListener implements Listener {
 
         Player player = event.getPlayer();
         Material itemInHand = player.getInventory().getItemInMainHand().getType();
-        
+
         if (itemInHand != Material.FLINT_AND_STEEL && itemInHand != Material.FIRE_CHARGE) {
             return;
         }
@@ -510,13 +510,13 @@ public final class CheckpointListener implements Listener {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Block block = blockLoc.getBlock();
             BlockData newBlockData = block.getBlockData();
-            
+
             if (newBlockData instanceof Lightable newLightable && newLightable.isLit()) {
                 Checkpoint checkpoint = plugin.getCheckpointManager().getCheckpointAt(blockLoc);
                 if (checkpoint != null && !checkpoint.isLit()) {
                     checkpoint.setLit(true);
                     plugin.getCheckpointManager().setCheckpointLit(checkpoint, true);
-                    
+
                     Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
                     if (owner != null && owner.isOnline()) {
                         MessageUtil.send(owner, "&aYour campfire checkpoint at &f(" + 

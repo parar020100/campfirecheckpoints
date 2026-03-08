@@ -36,7 +36,7 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, 
                              @NotNull String label, @NotNull String[] args) {
-        
+
         if (!(sender instanceof Player player)) {
             sender.sendMessage("This command can only be used by players.");
             return true;
@@ -92,11 +92,11 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         String limitDisplay = max > 0 ? " &7(" + checkpoints.size() + "/" + max + ")" : "";
 
         MessageUtil.send(player, "&6&l=== Your Checkpoints ===" + limitDisplay);
-        
+
         for (int i = 0; i < checkpoints.size(); i++) {
             Checkpoint cp = checkpoints.get(i);
             Location loc = cp.getBlockLocation();
-            
+
             String status = cp.isLit() ? "&a✓ Lit" : "&c✗ Extinguished";
             String coords = loc != null ? 
                 String.format("&f%d, %d, %d", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()) :
@@ -171,7 +171,7 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
     private void handleInfo(@NotNull Player player) {
         CheckpointManager manager = plugin.getCheckpointManager();
         ConfigManager configManager = plugin.getConfigManager();
-        
+
         int playerCount = manager.getPlayerCheckpoints(player.getUniqueId()).size();
         int totalCount = manager.getTotalCheckpointCount();
         int max = configManager.getMaxCheckpointsPerPlayer();
@@ -212,7 +212,7 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
             int checkpointCount = plugin.getCheckpointManager()
                 .getPlayerCheckpoints(player.getUniqueId()).size();
-            
+
             return IntStream.range(0, checkpointCount)
                 .mapToObj(String::valueOf)
                 .filter(s -> s.startsWith(args[1]))
