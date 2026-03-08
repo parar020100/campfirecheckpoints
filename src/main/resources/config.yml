@@ -3,13 +3,16 @@
 # Campfire Checkpoints Configuration
 # ================================
 
-
+# Configure the campfire types used in the plugin
 enable-regular-campfires: true
 enable-soul-campfires: true
 
+# The minimal distance (in blocks) between checkpoints:
+# When setting a checkpoint, checks for existing ones within this radius
+min-distance: 500
+
 # The maximum radius (in blocks) for checkpoint operations:
-# - When setting a checkpoint, checks for existing ones within this radius
-# - When respawning, finds the closest checkpoint within this radius of death
+# When respawning, finds the closest checkpoint within this radius of death
 radius: 500
 
 # If true, the campfire will be extinguished after a player respawns at it.

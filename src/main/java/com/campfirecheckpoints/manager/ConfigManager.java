@@ -17,6 +17,7 @@ public final class ConfigManager {
     private boolean enableRegularCampfires;
     private boolean enableSoulCampfires;
     private int radius;
+    private int minDistance;
     private boolean extinguishOnRespawn;
     private @NotNull Sound soundOnSet;
     private int overrideConfirmationTimeout;
@@ -27,6 +28,7 @@ public final class ConfigManager {
     private static final boolean DEFAULT_ENABLE_REGULAR = true;
     private static final boolean DEFAULT_ENABLE_SOUL = true;
     private static final int DEFAULT_RADIUS = 500;
+    private static final int DEFAULT_MIN_DISTANCE = 500;
     private static final boolean DEFAULT_EXTINGUISH = true;
     private static final Sound DEFAULT_SOUND = Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN;
     private static final int DEFAULT_OVERRIDE_TIMEOUT = 5;
@@ -51,6 +53,12 @@ public final class ConfigManager {
         if (radius <= 0) {
             plugin.getLogger().warning("Invalid radius in config. Using default: " + DEFAULT_RADIUS);
             this.radius = DEFAULT_RADIUS;
+        }
+
+        this.minDistance = config.getInt("min-distance", DEFAULT_MIN_DISTANCE);
+        if (minDistance <= 0) {
+            plugin.getLogger().warning("Invalid min distance in config. Using default: " + DEFAULT_MIN_DISTANCE);
+            this.minDistance = DEFAULT_MIN_DISTANCE;
         }
 
         // Load extinguish-on-respawn
@@ -87,6 +95,7 @@ public final class ConfigManager {
         plugin.getLogger().info("Configuration loaded " +
             "- Regular campfires: " + enableRegularCampfires +
             ", Soul campfires: " + enableSoulCampfires +
+            ", Min. distance: " + minDistance +
             ", Radius: " + radius +
             ", Extinguish: " + extinguishOnRespawn +
             ", Timeout: " + overrideConfirmationTimeout + "s" +
@@ -105,6 +114,10 @@ public final class ConfigManager {
 
     public int getRadius() {
         return radius;
+    }
+
+    public int getMinDistance() {
+        return minDistance;
     }
 
     public boolean isExtinguishOnRespawn() {

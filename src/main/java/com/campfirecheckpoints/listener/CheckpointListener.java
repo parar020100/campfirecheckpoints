@@ -104,9 +104,9 @@ public final class CheckpointListener implements Listener {
             return;
         }
 
-        int radius = configManager.getRadius();
+        int min_distance = configManager.getMinDistance();
         Checkpoint existingNearby = checkpointManager.findCheckpointWithinRadius(
-            playerUUID, blockLocation, radius
+            playerUUID, blockLocation, min_distance
         );
 
         if (existingNearby != null) {
@@ -119,7 +119,7 @@ public final class CheckpointListener implements Listener {
 
             int timeout = configManager.getOverrideConfirmationTimeout();
             MessageUtil.send(player, "&cWarning: &eYou have a checkpoint at " + existingCoords + 
-                " within " + radius + " blocks!");
+                " within " + min_distance + " blocks!");
             MessageUtil.send(player, "&eRight-click again within " + timeout + " seconds to override it.");
             event.setCancelled(true);
             return;
