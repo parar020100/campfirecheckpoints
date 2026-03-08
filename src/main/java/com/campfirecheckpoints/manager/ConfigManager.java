@@ -43,8 +43,8 @@ public final class ConfigManager {
     public void reload() {
         FileConfiguration config = plugin.getConfig();
 
-        this.enableRegularCampfires = config.GetBoolean("enable-regular-campfires", DEFAULT_ENABLE_REGULAR);
-        this.enableSoulCampfires = config.GetBoolean("enable-soul-campfires", DEFAULT_ENABLE_SOUL);
+        this.enableRegularCampfires = config.getBoolean("enable-regular-campfires", DEFAULT_ENABLE_REGULAR);
+        this.enableSoulCampfires = config.getBoolean("enable-soul-campfires", DEFAULT_ENABLE_SOUL);
 
         // Load radius
         this.radius = config.getInt("radius", DEFAULT_RADIUS);
