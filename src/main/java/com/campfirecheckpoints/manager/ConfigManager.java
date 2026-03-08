@@ -14,6 +14,8 @@ public final class ConfigManager {
     private final @NotNull CampfireCheckpoints plugin;
 
     // Cached config values
+    private boolean enableRegularCampfires;
+    private boolean enableSoulCampfires;
     private int radius;
     private boolean extinguishOnRespawn;
     private @NotNull Sound soundOnSet;
@@ -22,6 +24,8 @@ public final class ConfigManager {
     private @NotNull RespawnPriority respawnPriority;
 
     // Default values
+    private static final boolean DEFAULT_ENABLE_REGULAR = true;
+    private static final boolean DEFAULT_ENABLE_SOUL = true;
     private static final int DEFAULT_RADIUS = 500;
     private static final boolean DEFAULT_EXTINGUISH = true;
     private static final Sound DEFAULT_SOUND = Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN;
@@ -38,6 +42,9 @@ public final class ConfigManager {
 
     public void reload() {
         FileConfiguration config = plugin.getConfig();
+
+        this.enableRegularCampfires = config.GetBoolean("enable-regular-campfires", DEFAULT_ENABLE_REGULAR);
+        this.enableSoulCampfires = config.GetBoolean("enable-soul-campfires", DEFAULT_ENABLE_SOUL);
 
         // Load radius
         this.radius = config.getInt("radius", DEFAULT_RADIUS);
@@ -72,17 +79,28 @@ public final class ConfigManager {
         try {
             this.soundOnSet = Sound.valueOf(soundName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            plugin.getLogger().log(Level.WARNING, 
+            plugin.getLogger().log(Level.WARNING,
                 "Invalid sound '" + soundName + "' in config. Using default.");
             this.soundOnSet = DEFAULT_SOUND;
         }
 
-        plugin.getLogger().info("Configuration loaded - Radius: " + radius + 
-            ", Extinguish: " + extinguishOnRespawn + 
+        plugin.getLogger().info("Configuration loaded " +
+            "- Regular campfires: " + enableRegularCampfires +
+            ", Soul campfires: " + enableSoulCampfires +
+            ", Radius: " + radius +
+            ", Extinguish: " + extinguishOnRespawn +
             ", Timeout: " + overrideConfirmationTimeout + "s" +
             ", MaxCheckpoints: " + (maxCheckpointsPerPlayer == 0 ? "unlimited" : maxCheckpointsPerPlayer) +
             ", RespawnPriority: " + respawnPriority.getConfigValue() +
             ", Sound: " + soundOnSet.name());
+    }
+
+    public boolean RegularCampfiresEnabled() {
+        return enableRegularCampfires;
+    }
+
+    public boolean SoulCampfiresEnabled() {
+        return enableSoulCampfires;
     }
 
     public int getRadius() {

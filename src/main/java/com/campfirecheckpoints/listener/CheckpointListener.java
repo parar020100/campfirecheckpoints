@@ -58,6 +58,14 @@ public final class CheckpointListener implements Listener {
             return;
         }
 
+        ConfigManager configManager = plugin.getConfigManager();
+        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
+            return;
+        };
+        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
+            return;
+        };
+
         Player player = event.getPlayer();
 
         if (!player.hasPermission("campfirecheckpoints.use")) {
@@ -82,7 +90,6 @@ public final class CheckpointListener implements Listener {
         Location blockLocation = clickedBlock.getLocation();
 
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
-        ConfigManager configManager = plugin.getConfigManager();
 
         if (checkpointManager.hasCheckpointAt(playerUUID, blockLocation)) {
             MessageUtil.send(player, "&eYou already have a checkpoint at this campfire!");
@@ -406,6 +413,14 @@ public final class CheckpointListener implements Listener {
             return;
         }
 
+        ConfigManager configManager = plugin.getConfigManager();
+        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
+            return;
+        };
+        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
+            return;
+        };
+
         Location blockLocation = block.getLocation();
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
 
@@ -442,6 +457,14 @@ public final class CheckpointListener implements Listener {
         if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
             return;
         }
+
+        ConfigManager configManager = plugin.getConfigManager();
+        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
+            return;
+        };
+        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
+            return;
+        };
 
         Player player = event.getPlayer();
         Material itemInHand = player.getInventory().getItemInMainHand().getType();
@@ -493,6 +516,14 @@ public final class CheckpointListener implements Listener {
         if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
             return;
         }
+
+        ConfigManager configManager = plugin.getConfigManager();
+        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
+            return;
+        };
+        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
+            return;
+        };
 
         Player player = event.getPlayer();
         Material itemInHand = player.getInventory().getItemInMainHand().getType();

@@ -3,6 +3,10 @@
 # Campfire Checkpoints Configuration
 # ================================
 
+
+enable-regular-campfires: true
+enable-soul-campfires: true
+
 # The maximum radius (in blocks) for checkpoint operations:
 # - When setting a checkpoint, checks for existing ones within this radius
 # - When respawning, finds the closest checkpoint within this radius of death
