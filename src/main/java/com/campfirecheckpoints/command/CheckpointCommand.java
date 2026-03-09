@@ -182,8 +182,12 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         MessageUtil.send(player, "&eYour Checkpoints: &f" + playerCount + 
             (max > 0 ? " / " + max : ""));
         MessageUtil.send(player, "&eTotal Checkpoints: &f" + totalCount);
-        MessageUtil.send(player, "&eRegular campfires enabled: &f" + configManager.RegularCampfiresEnabled());
-        MessageUtil.send(player, "&eSoul campfires enabled: &f" + configManager.SoulCampfiresEnabled());
+        MessageUtil.send(player, "&eRegular campfires enabled (overworld): &f" + configManager.isDimentionEnabledOverworld());
+        MessageUtil.send(player, "&eRegular campfires enabled (nether): &f" + configManager.isDimentionEnabledNether());
+        MessageUtil.send(player, "&eRegular campfires enabled (the end): &f" + configManager.isDimentionEnabledEnd());
+        MessageUtil.send(player, "&eSoul campfires enabled (overworld): &f" + configManager.isDimentionEnabledOverworldSoul());
+        MessageUtil.send(player, "&eSoul campfires enabled (nether): &f" + configManager.isDimentionEnabledNetherSoul());
+        MessageUtil.send(player, "&eSoul campfires enabled (the end): &f" + configManager.isDimentionEnabledEndSoul());
         MessageUtil.send(player, "&eRadius (regular campfires): &f" + configManager.getRadius() + " blocks");
         MessageUtil.send(player, "&eRadius (soul campfires): &f" + configManager.getSoulRadius() + " blocks");
         MessageUtil.send(player, "&eMin. distance between checkpoints: &f" + configManager.getMinDistance() + " blocks");

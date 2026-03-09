@@ -54,17 +54,30 @@ public final class CheckpointListener implements Listener {
         }
 
         Material type = clickedBlock.getType();
-        if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
+        boolean isRegularCampfire = (type == Material.CAMPFIRE);
+        boolean isSoulCampfire = (type == Material.SOUL_CAMPFIRE);
+
+        if (!isRegularCampfire && !isSoulCampfire) {
             return;
         }
 
         ConfigManager configManager = plugin.getConfigManager();
-        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
-            return;
-        };
-        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
-            return;
-        };
+        World.Environment env = event.getPlayer().getWorld().getEnvironment();
+
+        switch (env) {
+            case NORMAL:
+                if (isRegularCampfire && !configManager.isDimentionEnabledOverworld()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledOverworldSoul()) return;
+                break;
+            case NETHER:
+                if (isRegularCampfire && !configManager.isDimentionEnabledNether()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledNetherSoul()) return;
+                break;
+            case THE_END:
+                if (isRegularCampfire && !configManager.isDimentionEnabledEnd()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledEndSoul()) return;
+                break;
+        }
 
         Player player = event.getPlayer();
 
@@ -510,17 +523,31 @@ public final class CheckpointListener implements Listener {
         }
 
         Material type = clickedBlock.getType();
-        if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
+
+        boolean isRegularCampfire = (type == Material.CAMPFIRE);
+        boolean isSoulCampfire = (type == Material.SOUL_CAMPFIRE);
+
+        if (!isRegularCampfire && !isSoulCampfire) {
             return;
         }
 
         ConfigManager configManager = plugin.getConfigManager();
-        if (type == Material.CAMPFIRE && !configManager.RegularCampfiresEnabled()) {
-            return;
-        };
-        if (type == Material.SOUL_CAMPFIRE && !configManager.SoulCampfiresEnabled()) {
-            return;
-        };
+        World.Environment env = event.getPlayer().getWorld().getEnvironment();
+
+        switch (env) {
+            case NORMAL:
+                if (isRegularCampfire && !configManager.isDimentionEnabledOverworld()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledOverworldSoul()) return;
+                break;
+            case NETHER:
+                if (isRegularCampfire && !configManager.isDimentionEnabledNether()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledNetherSoul()) return;
+                break;
+            case THE_END:
+                if (isRegularCampfire && !configManager.isDimentionEnabledEnd()) return;
+                if (isSoulCampfire && !configManager.isDimentionEnabledEndSoul()) return;
+                break;
+        }
 
         Player player = event.getPlayer();
         Material itemInHand = player.getInventory().getItemInMainHand().getType();

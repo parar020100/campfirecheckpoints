@@ -3,9 +3,14 @@
 # Campfire Checkpoints Configuration
 # ================================
 
-# Configure the campfire types used in the plugin
-enable-regular-campfires: true
-enable-soul-campfires: true
+# Configure the campfire types used in the dimentions
+enable-regular-overworld: true
+enable-regular-nether: false
+enable-regular-end: false
+
+enable-soul-overworld: true
+enable-soul-nether: true
+enable-soul-end: false
 
 # The maximum radius (in blocks) for checkpoint respawn (with regular campfires):
 # When respawning, finds the closest checkpoint within this radius of death

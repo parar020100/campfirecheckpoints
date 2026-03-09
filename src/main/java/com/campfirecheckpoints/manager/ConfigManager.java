@@ -14,8 +14,14 @@ public final class ConfigManager {
     private final @NotNull CampfireCheckpoints plugin;
 
     // Cached config values
-    private boolean enableRegularCampfires;
-    private boolean enableSoulCampfires;
+
+    private boolean overworldEnableRegularCampfires;
+    private boolean netherEnableRegularCampfires;
+    private boolean endEnableRegularCampfires;
+    private boolean overworldEnableSoulCampfires;
+    private boolean netherEnableSoulCampfires;
+    private boolean endEnableSoulCampfires;
+
     private int radius;
     private int soulRadius;
     private int minDistance;
@@ -27,8 +33,13 @@ public final class ConfigManager {
     private @NotNull RespawnPriority respawnPriority;
 
     // Default values
-    private static final boolean DEFAULT_ENABLE_REGULAR = true;
-    private static final boolean DEFAULT_ENABLE_SOUL = true;
+    private static final boolean DEFAULT_DIMENTION_OVERWORLD = true;
+    private static final boolean DEFAULT_DIMENTION_NETHER = false;
+    private static final boolean DEFAULT_DIMENTION_END = false;
+    private static final boolean DEFAULT_DIMENTION_OVERWORLD_SOUL = true;
+    private static final boolean DEFAULT_DIMENTION_NETHER_SOUL = true;
+    private static final boolean DEFAULT_DIMENTION_END_SOUL = false;
+
     private static final int DEFAULT_RADIUS = 500;
     private static final int DEFAULT_SOUL_RADIUS = 1000;
     private static final int DEFAULT_MIN_DISTANCE = 250;
@@ -49,8 +60,12 @@ public final class ConfigManager {
     public void reload() {
         FileConfiguration config = plugin.getConfig();
 
-        this.enableRegularCampfires = config.getBoolean("enable-regular-campfires", DEFAULT_ENABLE_REGULAR);
-        this.enableSoulCampfires = config.getBoolean("enable-soul-campfires", DEFAULT_ENABLE_SOUL);
+        this.overworldEnableRegularCampfires = config.getBoolean("enable-overworld", DEFAULT_DIMENTION_OVERWORLD);
+        this.netherEnableRegularCampfires = config.getBoolean("enable-nether", DEFAULT_DIMENTION_NETHER);
+        this.endEnableRegularCampfires = config.getBoolean("enable-end", DEFAULT_DIMENTION_END);
+        this.overworldEnableSoulCampfires = config.getBoolean("enable-soul-overworld", DEFAULT_DIMENTION_OVERWORLD_SOUL);
+        this.netherEnableSoulCampfires = config.getBoolean("enable-soul-nether", DEFAULT_DIMENTION_NETHER_SOUL);
+        this.endEnableSoulCampfires = config.getBoolean("enable-soul-end", DEFAULT_DIMENTION_END_SOUL);
 
         // Load radius
         this.radius = config.getInt("radius", DEFAULT_RADIUS);
@@ -109,8 +124,12 @@ public final class ConfigManager {
         }
 
         plugin.getLogger().info("Configuration loaded " +
-            "- Regular campfires: " + enableRegularCampfires +
-            ", Soul campfires: " + enableSoulCampfires +
+            "- Regular campfires enabled (overworld): " + overworldEnableRegularCampfires +
+            ", Regular campfires enabled (nether): " + netherEnableRegularCampfires +
+            ", Regular campfires enabled (end): " + endEnableRegularCampfires +
+            ", Soul campfires enabled (overworld): " + overworldEnableSoulCampfires +
+            ", Soul campfires enabled (nether): " + netherEnableSoulCampfires +
+            ", Soul campfires enabled (end): " + endEnableSoulCampfires +
             ", Radius: " + radius +
             ", Radius (soul campfires): " + soulRadius +
             ", Min. distance: " + minDistance +
@@ -122,12 +141,23 @@ public final class ConfigManager {
             ", Sound: " + soundOnSet.name());
     }
 
-    public boolean RegularCampfiresEnabled() {
-        return enableRegularCampfires;
+    public boolean isDimentionEnabledOverworld() {
+        return overworldEnableRegularCampfires;
     }
-
-    public boolean SoulCampfiresEnabled() {
-        return enableSoulCampfires;
+    public boolean isDimentionEnabledOverworldSoul() {
+        return overworldEnableSoulCampfires;
+    }
+    public boolean isDimentionEnabledNether() {
+        return netherEnableRegularCampfires;
+    }
+    public boolean isDimentionEnabledNetherSoul() {
+        return netherEnableSoulCampfires;
+    }
+    public boolean isDimentionEnabledEnd() {
+        return endEnableRegularCampfires;
+    }
+    public boolean isDimentionEnabledEndSoul() {
+        return endEnableSoulCampfires;
     }
 
     public int getRadius() {
