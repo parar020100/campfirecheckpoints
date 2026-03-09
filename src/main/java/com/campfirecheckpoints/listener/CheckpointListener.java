@@ -240,6 +240,8 @@ public final class CheckpointListener implements Listener {
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
         ConfigManager configManager = plugin.getConfigManager();
 
+        checkpointManager.validateAllCheckpoints(playerUUID);
+
         Checkpoint closestCheckpoint = checkpointManager.findClosestCheckpoint(playerUUID, deathLocation);
 
         Location bedSpawn = player.getRespawnLocation();

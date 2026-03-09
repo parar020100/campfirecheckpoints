@@ -460,4 +460,73 @@ public final class CheckpointManager {
     public int getTotalCheckpointCount() {
         return locationIndex.size();
     }
+
+    public void validateAllCheckpoints(@Nullable UUID playerUUID) {
+        List<Checkpoint> toRemove = new ArrayList<>();
+        int extinguished = 0;
+        if (playerUUID == null) {
+            for (List<Checkpoint> checkpoints : playerCheckpoints.values()) {
+                CheckpointValidationResult result = checkAndCollectInvalid(checkpoints);
+                toRemove.addAll(result.toRemove);
+                extinguished += result.extinguished;
+            }
+        } else {
+            List<Checkpoint> checkpoints = playerCheckpoints.get(playerUUID);
+            if (checkpoints != null) {
+                CheckpointValidationResult result = checkAndCollectInvalid(checkpoints);
+                toRemove.addAll(result.toRemove);
+                extinguished += result.extinguished;
+            }
+        }
+        for (Checkpoint checkpoint : toRemove) {
+            removeCheckpointAt(checkpoint.getBlockLocation());
+        }
+        if (!toRemove.isEmpty() || extinguished > 0) {
+            markDirty();
+            String prefix = (playerUUID == null) ? "[All]" : "[Player]";
+            plugin.getLogger().info(prefix + " Removed " + toRemove.size() + " invalid checkpoints, extinguished " + extinguished + ".");
+        }
+    }
+
+    private static class CheckpointValidationResult {
+        List<Checkpoint> toRemove = new ArrayList<>();
+        int extinguished = 0;
+    }
+
+    private CheckpointValidationResult checkAndCollectInvalid(List<Checkpoint> checkpoints) {
+        CheckpointValidationResult result = new CheckpointValidationResult();
+        synchronized (checkpoints) {
+            for (Checkpoint checkpoint : checkpoints) {
+                Location loc = checkpoint.getBlockLocation();
+                if (loc == null || loc.getWorld() == null) {
+                    result.toRemove.add(checkpoint);
+                    continue;
+                }
+                org.bukkit.block.Block block = loc.getWorld().getBlockAt(loc);
+                org.bukkit.Material type = block.getType();
+                boolean isCampfire = (type == org.bukkit.Material.CAMPFIRE);
+                boolean isSoulCampfire = (type == org.bukkit.Material.SOUL_CAMPFIRE);
+                if (!isCampfire && !isSoulCampfire) {
+                    result.toRemove.add(checkpoint);
+                    continue;
+                }
+                org.bukkit.block.data.BlockData data = block.getBlockData();
+                if (data instanceof org.bukkit.block.data.Lightable lightable) {
+                    if (!lightable.isLit()) {
+                        if (checkpoint.isLit()) {
+                            setCheckpointLit(checkpoint, false);
+                            result.extinguished++;
+                        }
+                    } else {
+                        if (!checkpoint.isLit()) {
+                            setCheckpointLit(checkpoint, true);
+                        }
+                    }
+                } else {
+                    result.toRemove.add(checkpoint);
+                }
+            }
+        }
+        return result;
+    }
 }
