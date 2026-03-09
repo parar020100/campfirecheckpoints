@@ -82,7 +82,7 @@ public final class ConfigManager {
 
         // Load override confirmation timeout
         this.overrideConfirmationTimeout = config.getInt("override-confirmation-timeout", DEFAULT_OVERRIDE_TIMEOUT);
-        if (overrideConfirmationTimeout <= 0) {
+        if (overrideConfirmationTimeout < 0) {
             plugin.getLogger().warning("Invalid override-confirmation-timeout in config. Using default: " + DEFAULT_OVERRIDE_TIMEOUT);
             this.overrideConfirmationTimeout = DEFAULT_OVERRIDE_TIMEOUT;
         }
