@@ -34,6 +34,8 @@ sound-on-set: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
 # Time in seconds that players have to confirm overriding an existing checkpoint
 # When a player tries to set a checkpoint within radius of an existing one,
 # they must right-click again within this time to confirm
+#
+# Set to 0 to forbid overriding checkpoints
 override-confirmation-timeout: 5
 
 # Maximum number of checkpoints a player can have (0 = unlimited)
