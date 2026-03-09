@@ -105,6 +105,11 @@ public final class CheckpointListener implements Listener {
         }
 
         int min_distance = configManager.getMinDistance();
+
+        if (type == Material.SOUL_CAMPFIRE) {
+            min_distance = configManager.getSoulMinDistance();
+        };
+
         Checkpoint existingNearby = checkpointManager.findCheckpointWithinRadius(
             playerUUID, blockLocation, min_distance
         );

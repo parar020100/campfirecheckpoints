@@ -184,8 +184,10 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         MessageUtil.send(player, "&eTotal Checkpoints: &f" + totalCount);
         MessageUtil.send(player, "&eRegular campfires enabled: &f" + configManager.RegularCampfiresEnabled());
         MessageUtil.send(player, "&eSoul campfires enabled: &f" + configManager.SoulCampfiresEnabled());
-        MessageUtil.send(player, "&eMinimal distance between checkpoints: &f" + configManager.getMinDistance() + " blocks");
-        MessageUtil.send(player, "&eRadius: &f" + configManager.getRadius() + " blocks");
+        MessageUtil.send(player, "&eRadius (regular campfires): &f" + configManager.getRadius() + " blocks");
+        MessageUtil.send(player, "&eRadius (soul campfires): &f" + configManager.getSoulRadius() + " blocks");
+        MessageUtil.send(player, "&eMin. distance between checkpoints: &f" + configManager.getMinDistance() + " blocks");
+        MessageUtil.send(player, "&eMin. distance between checkpoints (soul): &f" + configManager.getSoulMinDistance() + " blocks");
         MessageUtil.send(player, "&eExtinguish on Respawn: &f" + configManager.isExtinguishOnRespawn());
         MessageUtil.send(player, "&eConfirmation Timeout: &f" + 
             configManager.getOverrideConfirmationTimeout() + "s");

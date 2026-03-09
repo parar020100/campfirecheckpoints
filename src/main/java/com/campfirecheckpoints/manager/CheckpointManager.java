@@ -268,10 +268,13 @@ public final class CheckpointManager {
         double radius = plugin.getConfigManager().getRadius();
         double radiusSquared = radius * radius;
 
+        double radiusSoul = plugin.getConfigManager().getSoulRadius();
+        double radiusSoulSquared = radiusSoul * radiusSoul;
+
         synchronized (checkpoints) {
             return checkpoints.stream()
                 .filter(Checkpoint::isLit)
-                .filter(cp -> cp.distanceSquared(deathLocation) <= radiusSquared)
+                .filter(cp -> cp.isWithinRespawnRadius(deathLocation, radiusSquared, radiusSoulSquared))
                 .min(Comparator.comparingDouble(cp -> cp.distanceSquared(deathLocation)))
                 .orElse(null);
         }

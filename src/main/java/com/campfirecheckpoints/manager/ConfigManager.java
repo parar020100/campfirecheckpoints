@@ -17,7 +17,9 @@ public final class ConfigManager {
     private boolean enableRegularCampfires;
     private boolean enableSoulCampfires;
     private int radius;
+    private int soulRadius;
     private int minDistance;
+    private int soulMinDistance;
     private boolean extinguishOnRespawn;
     private @NotNull Sound soundOnSet;
     private int overrideConfirmationTimeout;
@@ -28,7 +30,9 @@ public final class ConfigManager {
     private static final boolean DEFAULT_ENABLE_REGULAR = true;
     private static final boolean DEFAULT_ENABLE_SOUL = true;
     private static final int DEFAULT_RADIUS = 500;
-    private static final int DEFAULT_MIN_DISTANCE = 500;
+    private static final int DEFAULT_SOUL_RADIUS = 1000;
+    private static final int DEFAULT_MIN_DISTANCE = 250;
+    private static final int DEFAULT_SOUL_MIN_DISTANCE = 500;
     private static final boolean DEFAULT_EXTINGUISH = true;
     private static final Sound DEFAULT_SOUND = Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN;
     private static final int DEFAULT_OVERRIDE_TIMEOUT = 5;
@@ -55,10 +59,22 @@ public final class ConfigManager {
             this.radius = DEFAULT_RADIUS;
         }
 
+        this.soulRadius = config.getInt("soul-campfire-radius", DEFAULT_SOUL_RADIUS);
+        if (radius <= 0) {
+            plugin.getLogger().warning("Invalid soul campfire radius in config. Using default: " + DEFAULT_SOUL_RADIUS);
+            this.soulRadius = DEFAULT_SOUL_RADIUS;
+        }
+
         this.minDistance = config.getInt("min-distance", DEFAULT_MIN_DISTANCE);
         if (minDistance <= 0) {
             plugin.getLogger().warning("Invalid min distance in config. Using default: " + DEFAULT_MIN_DISTANCE);
             this.minDistance = DEFAULT_MIN_DISTANCE;
+        }
+
+        this.soulMinDistance = config.getInt("soul-campfire-min-distance", DEFAULT_SOUL_MIN_DISTANCE);
+        if (minDistance <= 0) {
+            plugin.getLogger().warning("Invalid min distance in config. Using default: " + DEFAULT_SOUL_MIN_DISTANCE);
+            this.soulMinDistance = DEFAULT_SOUL_MIN_DISTANCE;
         }
 
         // Load extinguish-on-respawn
@@ -95,8 +111,10 @@ public final class ConfigManager {
         plugin.getLogger().info("Configuration loaded " +
             "- Regular campfires: " + enableRegularCampfires +
             ", Soul campfires: " + enableSoulCampfires +
-            ", Min. distance: " + minDistance +
             ", Radius: " + radius +
+            ", Radius (soul campfires): " + soulRadius +
+            ", Min. distance: " + minDistance +
+            ", Min. distance (soul campfires): " + soulMinDistance +
             ", Extinguish: " + extinguishOnRespawn +
             ", Timeout: " + overrideConfirmationTimeout + "s" +
             ", MaxCheckpoints: " + (maxCheckpointsPerPlayer == 0 ? "unlimited" : maxCheckpointsPerPlayer) +
@@ -116,8 +134,16 @@ public final class ConfigManager {
         return radius;
     }
 
+    public int getSoulRadius() {
+        return soulRadius;
+    }
+
     public int getMinDistance() {
         return minDistance;
+    }
+
+    public int getSoulMinDistance() {
+        return soulMinDistance;
     }
 
     public boolean isExtinguishOnRespawn() {
