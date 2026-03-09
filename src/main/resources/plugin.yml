@@ -1,6 +1,6 @@
 # src/main/resources/plugin.yml
 name: CampfireCheckpoints
-version: '1.1.0'
+version: '1.2.0-parar'
 main: com.campfirecheckpoints.CampfireCheckpoints
 api-version: '1.21'
 description: A respawn system using campfires as checkpoints
