@@ -99,7 +99,7 @@ public final class CheckpointListener implements Listener {
 
         if (checkpointManager.tryExecuteOverride(playerUUID, blockLocation)) {
             playCheckpointEffects(player, blockLocation);
-            MessageUtil.send(player, "&aCheckpoint override confirmed! Previous checkpoint removed.");
+            MessageUtil.send(player, "&aCheckpoint override confirmed!");
             event.setCancelled(true);
             return;
         }
@@ -118,7 +118,7 @@ public final class CheckpointListener implements Listener {
             int timeout = configManager.getOverrideConfirmationTimeout();
 
             if (timeout > 0) {
-                checkpointManager.setPendingOverride(playerUUID, existingNearby, blockLocation);
+                checkpointManager.setPendingOverride(playerUUID, blockLocation, min_distance);
             }
 
             Location existingLoc = existingNearby.getBlockLocation();
@@ -132,8 +132,7 @@ public final class CheckpointListener implements Listener {
                 " within " + min_distance + " blocks!");
                 MessageUtil.send(player, "&eRight-click again within " + timeout + " seconds to override it.");
             } else {
-                MessageUtil.send(player, "&cFail: &eYou already have a checkpoint nearby at " + existingCoords + 
-                " within " + min_distance + " blocks!");
+                MessageUtil.send(player, "&cYou already have a checkpoint nearby within " + min_distance + " blocks!");
             }
             event.setCancelled(true);
             return;

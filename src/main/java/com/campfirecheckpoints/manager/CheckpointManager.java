@@ -11,6 +11,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import com.campfirecheckpoints.util.MessageUtil;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -304,12 +306,12 @@ public final class CheckpointManager {
     }
 
 
-    public void setPendingOverride(@NotNull UUID playerUUID, @NotNull Checkpoint toOverride, 
-                                    @NotNull Location newLocation) {
+    public void setPendingOverride(@NotNull UUID playerUUID, @NotNull Location newLocation, double radius) {
         overrideLock.lock();
         try {
-            pendingOverrides.put(playerUUID, new PendingOverride(toOverride, newLocation, 
-                System.currentTimeMillis()));
+            pendingOverrides.put(playerUUID,
+                                 new PendingOverride(newLocation, radius,
+                                                     System.currentTimeMillis()));
         } finally {
             overrideLock.unlock();
         }
@@ -349,13 +351,38 @@ public final class CheckpointManager {
         // Remove old checkpoint
         List<Checkpoint> checkpoints = playerCheckpoints.get(playerUUID);
         if (checkpoints != null) {
+            List<Checkpoint> toRemove = new ArrayList<>();
+            List<String> keysToRemove = new ArrayList<>();
+
             synchronized (checkpoints) {
-                checkpoints.remove(pending.toOverride);
+                for (Checkpoint checkpoint : checkpoints) {
+                    if (checkpoint.isWithinRadius(pending.newLocation, pending.radius)) {
+                        toRemove.add(checkpoint);
+                        keysToRemove.add(checkpoint.getLocationKey());
+                    }
+                }
+            }
+
+            synchronized (checkpoints) {
+                for (Checkpoint checkpoint : toRemove) {
+                    checkpoints.remove(checkpoint);
+                }
+
                 if (checkpoints.isEmpty()) {
                     playerCheckpoints.remove(playerUUID);
                 }
             }
-            locationIndex.remove(pending.toOverride.getLocationKey());
+
+            Player owner = Bukkit.getPlayer(playerUUID);
+
+            synchronized(locationIndex) {
+                for (String key : keysToRemove) {
+                    locationIndex.remove(key);
+                    if (owner != null && owner.isOnline()) {
+                    MessageUtil.send(owner, "&fPrevious checkpoint removed: &e(" + key + ")!");
+                    }
+                }
+            }
         }
 
         // Add new checkpoint
@@ -418,13 +445,13 @@ public final class CheckpointManager {
     }
 
     public static final class PendingOverride {
-        public final @NotNull Checkpoint toOverride;
+        public final @NotNull double radius;
         public final @NotNull Location newLocation;
         public final long timestamp;
 
-        public PendingOverride(@NotNull Checkpoint toOverride, @NotNull Location newLocation, 
+        public PendingOverride(@NotNull Location newLocation, double radius,
                                long timestamp) {
-            this.toOverride = toOverride;
+            this.radius = radius;
             this.newLocation = newLocation;
             this.timestamp = timestamp;
         }
