@@ -125,6 +125,12 @@ public final class Checkpoint {
         if (location == null || location.getWorld() == null) {
             return Double.MAX_VALUE;
         }
+
+        if (anchor) {
+            // If we have an active anchor, it is prioritized over distance checks
+            return 0;
+        }
+
         if (!location.getWorld().getName().equals(worldName)) {
             return Double.MAX_VALUE;
         }
