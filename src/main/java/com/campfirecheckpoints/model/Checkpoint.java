@@ -147,7 +147,7 @@ public final class Checkpoint {
                                          double radiusSquaredSoul) {
 
         if (anchor) {
-            return false; // Respawn anchors are not affected by radius checks
+            return true; // Respawn anchors are not affected by radius checks
         }
 
         double radiusSquared = soul ? radiusSquaredSoul : radiusSquaredRegular;
@@ -156,9 +156,14 @@ public final class Checkpoint {
 
 
     public boolean isWithinRadius(@Nullable Location location, double radius) {
+        if (anchor) {
+            return true; // Respawn anchors are not affected by radius checks
+        }
+
         if (location == null) {
             return false;
         }
+
         return distanceSquared(location) <= radius * radius;
     }
 
