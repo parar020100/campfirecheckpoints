@@ -597,4 +597,53 @@ public final class CheckpointManager {
             markDirty();
         }
     }
+
+    /*
+     * Returns the player's respawn-anchor checkpoint (if any).
+     * If multiple anchor checkpoints somehow exist, this method will keep the newest one
+     * (by createdAt) and remove the rest.
+     */
+    public @Nullable Checkpoint findAnchorCheckpoint(@NotNull UUID playerUUID) {
+        List<Checkpoint> checkpoints = playerCheckpoints.get(playerUUID);
+        if (checkpoints == null) {
+            return null;
+        }
+
+        Checkpoint best = null;
+        boolean removedAny = false;
+
+        synchronized (checkpoints) {
+            for (Iterator<Checkpoint> it = checkpoints.iterator(); it.hasNext(); ) {
+                Checkpoint cp = it.next();
+                if (cp == null || !cp.isAnchor()) {
+                    continue;
+                }
+
+                if (best == null) {
+                    best = cp;
+                    continue;
+                }
+
+                // Keep the newest anchor checkpoint
+                if (cp.getCreatedAt() > best.getCreatedAt()) {
+                    // remove previous best
+                    locationIndex.remove(best.getLocationKey());
+                    it.remove();
+                    removedAny = true;
+                    best = cp;
+                } else {
+                    // remove current cp
+                    locationIndex.remove(cp.getLocationKey());
+                    it.remove();
+                    removedAny = true;
+                }
+            }
+        }
+
+        if (removedAny) {
+            markDirty();
+        }
+
+        return best;
+    }
 }
