@@ -22,6 +22,7 @@ public final class Checkpoint {
     private final long createdAt;
     private volatile boolean lit;
     private volatile boolean soul;
+    private volatile boolean anchor;
 
     public Checkpoint(@NotNull UUID ownerUUID, @NotNull Location location) {
         Objects.requireNonNull(ownerUUID, "Owner UUID cannot be null");
@@ -36,12 +37,14 @@ public final class Checkpoint {
         this.createdAt = System.currentTimeMillis();
         this.lit = true;
 
-        this.soul = (location.getBlock().getType() == Material.SOUL_CAMPFIRE);
+        Material blockType = location.getBlock().getType();
+        this.soul = (blockType == Material.SOUL_CAMPFIRE);
+        this.anchor = (blockType == Material.RESPAWN_ANCHOR);
     }
 
     private Checkpoint(@NotNull UUID ownerUUID, @NotNull String worldName,
                        int x, int y, int z, long createdAt, boolean lit,
-                       boolean soul) {
+                       boolean soul, boolean anchor) {
         this.ownerUUID = ownerUUID;
         this.worldName = worldName;
         this.x = x;
@@ -50,6 +53,7 @@ public final class Checkpoint {
         this.createdAt = createdAt;
         this.lit = lit;
         this.soul = soul;
+        this.anchor = anchor;
     }
 
     public @NotNull UUID getOwnerUUID() {
@@ -92,6 +96,13 @@ public final class Checkpoint {
         this.soul = soul;
     }
 
+    public boolean isAnchor() {
+        return anchor;
+    }
+
+    public void setAnchor(boolean anchor) {
+        this.anchor = anchor;
+    }
 
     public @Nullable Location getSpawnLocation() {
         World world = Bukkit.getWorld(worldName);
@@ -128,6 +139,11 @@ public final class Checkpoint {
     public boolean isWithinRespawnRadius(@Nullable Location location,
                                          double radiusSquaredRegular,
                                          double radiusSquaredSoul) {
+
+        if (anchor) {
+            return false; // Respawn anchors are not affected by radius checks
+        }
+
         double radiusSquared = soul ? radiusSquaredSoul : radiusSquaredRegular;
         return (distanceSquared(location) <= radiusSquared);
     }
@@ -153,6 +169,7 @@ public final class Checkpoint {
         json.addProperty("createdAt", createdAt);
         json.addProperty("lit", lit);
         json.addProperty("soul", soul);
+        json.addProperty("anchor", anchor);
         return json;
     }
 
@@ -171,8 +188,9 @@ public final class Checkpoint {
                 json.get("createdAt").getAsLong() : System.currentTimeMillis();
             boolean lit = !json.has("lit") || json.get("lit").getAsBoolean();
             boolean soul = json.has("soul") && json.get("soul").getAsBoolean();
+            boolean anchor = json.has("anchor") && json.get("anchor").getAsBoolean();
 
-            return new Checkpoint(ownerUUID, world, x, y, z, createdAt, lit, soul);
+            return new Checkpoint(ownerUUID, world, x, y, z, createdAt, lit, soul, anchor);
         } catch (Exception e) {
             return null;
         }
@@ -202,7 +220,7 @@ public final class Checkpoint {
 
     @Override
     public String toString() {
-        return String.format("Checkpoint{owner=%s, world=%s, pos=[%d, %d, %d], lit=%s, soul=%s}",
-            ownerUUID, worldName, x, y, z, lit, soul);
+        return String.format("Checkpoint{owner=%s, world=%s, pos=[%d, %d, %d], lit=%s, soul=%s, anchor=%s}",
+            ownerUUID, worldName, x, y, z, lit, soul, anchor);
     }
 }
