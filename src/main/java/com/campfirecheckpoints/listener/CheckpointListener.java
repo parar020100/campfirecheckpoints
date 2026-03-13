@@ -73,7 +73,7 @@ public final class CheckpointListener implements Listener {
 
             if (env == World.Environment.NORMAL && !configManager.isDimentionEnabledOverworldAnchor()) {
                 MessageUtil.send(player, "&cSetting respawn anchors as checkpoints is not allowed in the Overworld.");
-                event.setCancelled(true);
+                //event.setCancelled(true);
                 return;
             }
 
@@ -85,7 +85,7 @@ public final class CheckpointListener implements Listener {
 
             if (env == World.Environment.THE_END && !configManager.isDimentionEnabledEndAnchor()) {
                 MessageUtil.send(player, "&cSetting respawn anchors as checkpoints is not allowed in the End.");
-                event.setCancelled(true);
+                //event.setCancelled(true);
                 return;
             }
 
@@ -106,7 +106,8 @@ public final class CheckpointListener implements Listener {
             BlockData blockData = clickedBlock.getBlockData();
             if (blockData instanceof RespawnAnchor anchorData) {
                 if (anchorData.getCharges() <= 0) {
-                    MessageUtil.send(player, "&cThis respawn anchor is uncharged! Charge it with glowstone to set a checkpoint.");
+                    MessageUtil.send(player, "&cThis respawn anchor is uncharged!" + 
+                                     " Charge it with glowstone to set a checkpoint.");
                     event.setCancelled(true);
                     return;
                 }
@@ -118,7 +119,9 @@ public final class CheckpointListener implements Listener {
             Checkpoint newCheckpoint = new Checkpoint(playerUUID, blockLocation);
             checkpointManager.addCheckpoint(playerUUID, newCheckpoint);
 
-            String worldName = blockLocation.getWorld() != null ? blockLocation.getWorld().getName().replace("world_", "") : "unknown";
+            String worldName = blockLocation.getWorld() != null ?
+                                    blockLocation.getWorld().getName().replace("world_", "") : "unknown";
+
             MessageUtil.send(player, "&aCheckpoint set at respawn anchor &f("
                              + blockLocation.getBlockX() + ", "
                              + blockLocation.getBlockY() + ", "
@@ -367,11 +370,13 @@ public final class CheckpointListener implements Listener {
                     if (anchor) {
                         MessageUtil.send(player, "&aYou respawned at your respawn anchor!");
                         // Play respawn anchor spawn sound
-                        player.playSound(player.getLocation(), Sound.RESPAWN_ANCHOR_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f); ///
+                        player.playSound(player.getLocation(), Sound.RESPAWN_ANCHOR_SPAWN,
+                                         SoundCategory.BLOCKS, 1.0f, 1.0f);
                     } else {
                         MessageUtil.send(player, "&aYou respawned at your campfire checkpoint!");
                         if (extinguished) {
-                            MessageUtil.send(player, "&7The campfire has been extinguished. Use Flint & Steel to relight it.");
+                            MessageUtil.send(player, "&7The campfire has been extinguished." +
+                                             " Use Flint & Steel to relight it.");
                         }
                     }
                 } else if (usedBed) {
