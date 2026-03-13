@@ -50,7 +50,7 @@ max-checkpoints-per-player: 0
 # Priority when both bed spawn and campfire checkpoint are available within radius
 # Options:
 #   "checkpoint" - Campfire checkpoint always takes priority over bed (default)
-#   "bed"        - Bed spawn always takes priority over checkpoint
+#   "bed"        - Bed spawn or respawn anchor always take priority over checkpoint
 #   "closest"    - Whichever is closer to the death location takes priority
 #
 # Note: This only applies when BOTH a valid bed spawn AND a lit checkpoint
