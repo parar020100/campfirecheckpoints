@@ -97,14 +97,15 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
             Checkpoint cp = checkpoints.get(i);
             Location loc = cp.getBlockLocation();
 
-            String status = cp.isLit() ? "&a✓ Lit" : "&c✗ Extinguished";
+            String status = cp.isLit() ? "&a✓ Lit" : "&c✗ Put out";
             String coords = loc != null ? 
                 String.format("&f%d, %d, %d", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()) :
                 "&cUnknown";
-            String world = cp.getWorldName();
+            String world = cp.getWorldName().replace("world_", "");
             String date = dateFormat.format(new Date(cp.getCreatedAt()));
+            String type = cp.isSoul() ? " &9(soul)" : "";
 
-            MessageUtil.send(player, "&e[" + i + "] " + status + " &7| " + coords + 
+            MessageUtil.send(player, "&e[" + i + "] " + status + type + " &7| " + coords + 
                 " &7(" + world + ")");
             MessageUtil.send(player, "    &7Created: " + date);
         }
