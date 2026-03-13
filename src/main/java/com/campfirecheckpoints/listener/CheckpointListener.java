@@ -57,7 +57,7 @@ public final class CheckpointListener implements Listener {
         // If player interacts with a bed, clear their respawn-anchor checkpoint(s),
         // but do not cancel the bed interaction.
         if (clickedBlock.getBlockData() instanceof org.bukkit.block.data.type.Bed) {
-            plugin.getCheckpointManager().removeAnchorCheckpoints(event.getPlayer().getUniqueId());
+            plugin.getCheckpointManager().removeAnchorCheckpoints(event.getPlayer().getUniqueId(), true);
             return;
         }
 
@@ -121,7 +121,7 @@ public final class CheckpointListener implements Listener {
             }
 
             // Remove all other anchor checkpoints, there can be only one per player
-            checkpointManager.removeAnchorCheckpoints(playerUUID);
+            checkpointManager.removeAnchorCheckpoints(playerUUID, false);
 
             Checkpoint newCheckpoint = new Checkpoint(playerUUID, blockLocation);
             checkpointManager.addCheckpoint(playerUUID, newCheckpoint);
@@ -575,12 +575,12 @@ public final class CheckpointListener implements Listener {
             Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
             if (owner != null && owner.isOnline()) {
                 if (isNowLit) {
-                    MessageUtil.send(owner, "&aYour respawn anchor checkpoint at &f(" +
+                    MessageUtil.send(owner, "&aYour respawn anchor at &f(" +
                             blockLoc.getBlockX() + ", " +
                             blockLoc.getBlockY() + ", " +
                             blockLoc.getBlockZ() + ") &ahas been charged!");
                 } else {
-                    MessageUtil.send(owner, "&eYour respawn anchor checkpoint at &f(" +
+                    MessageUtil.send(owner, "&eYour respawn anchor at &f(" +
                             blockLoc.getBlockX() + ", " +
                             blockLoc.getBlockY() + ", " +
                             blockLoc.getBlockZ() + ") &ehas no charge left!");

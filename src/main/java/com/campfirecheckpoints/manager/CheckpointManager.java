@@ -553,13 +553,13 @@ public final class CheckpointManager {
                         result.unchargedAnchors++;
 
                         if (owner != null && owner.isOnline()) {
-                            MessageUtil.send(owner, "&eYour anchor checkpoint at &f" + checkpoint.getLocationKey() + " &eis not charged.");
+                            MessageUtil.send(owner, "&eYour anchor at &f" + checkpoint.getLocationKey() + " &eis not charged.");
                         }
                     } else if (anchorData.getCharges() > 0 && !checkpoint.isLit()) {
                         setCheckpointLit(checkpoint, true);
 
                         if (owner != null && owner.isOnline()) {
-                            MessageUtil.send(owner, "&eYour anchor checkpoint at &f" + checkpoint.getLocationKey() + " &ahas been recharged.");
+                            MessageUtil.send(owner, "&eYour anchor at &f" + checkpoint.getLocationKey() + " &ahas been recharged.");
                         }
                     }
                 } else {
@@ -575,7 +575,7 @@ public final class CheckpointManager {
      * Deletes all respawn-anchor checkpoints for the given player.
      * This is done in one pass and keeps {@link #locationIndex} in sync.
      */
-    public void removeAnchorCheckpoints(@NotNull UUID playerUUID) {
+    public void removeAnchorCheckpoints(@NotNull UUID playerUUID, boolean byBed) {
         List<Checkpoint> checkpoints = playerCheckpoints.get(playerUUID);
         if (checkpoints == null) {
             return;
@@ -596,9 +596,14 @@ public final class CheckpointManager {
 
                 Player owner = Bukkit.getPlayer(playerUUID);
                 if (owner != null && owner.isOnline()) {
-                    MessageUtil.send(owner, "&eYour anchor checkpoint at &f"
-                                     + cp.getLocationKey() + " &chas been removed.");
-                    plugin.getLogger().info("[Player] Removed anchor checkpoint at &f" + 
+                    if (byBed) {
+                        MessageUtil.send(owner, "&eYour respawn anchor at &f"
+                                         + cp.getLocationKey() + " &ehas been disabled.");
+                    } else {
+                        MessageUtil.send(owner, "&eYour respawn anchor at &f"
+                                         + cp.getLocationKey() + " &chas been removed.");
+                    }
+                    plugin.getLogger().info("[Player] Removed respawn anchor at &f" +
                                             cp.getLocationKey() + " &7for " + playerUUID + ".");
                 }
             }
