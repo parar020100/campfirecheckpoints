@@ -121,6 +121,7 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
                 type += " &9(soul)";
             } else if (cp.isAnchor()) {
                 type += " &d(anchor)";
+                status = cp.isLit() ? "&a✓ Charged" : "&c✗ Disabled";
             }
 
             MessageUtil.send(player, "&e[" + i + "] " + status + type + " &7| " + coords + 
