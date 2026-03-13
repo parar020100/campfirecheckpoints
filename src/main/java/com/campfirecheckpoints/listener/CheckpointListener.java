@@ -56,13 +56,26 @@ public final class CheckpointListener implements Listener {
         Material type = clickedBlock.getType();
         boolean isRegularCampfire = (type == Material.CAMPFIRE);
         boolean isSoulCampfire = (type == Material.SOUL_CAMPFIRE);
+        boolean isRespawnAnchor = (type == Material.RESPAWN_ANCHOR);
+
+        ConfigManager configManager = plugin.getConfigManager();
+        World.Environment env = event.getPlayer().getWorld().getEnvironment();
+        Player player = event.getPlayer();
+
+        // Deny respawn anchor spawnpoint in Nether unless enabled, but allow charging with glowstone
+        if (isRespawnAnchor && configManager.RespawnAnchorsEnabled()) {
+            Material itemInHand = player.getInventory().getItemInMainHand().getType();
+            if (env == World.Environment.NETHER && itemInHand != Material.GLOWSTONE) {
+                event.setCancelled(true);
+                MessageUtil.send(player, "&cSetting respawn anchor spawnpoint in Nether is disabled by this plugin!");
+                return;
+            }
+        }
 
         if (!isRegularCampfire && !isSoulCampfire) {
             return;
         }
 
-        ConfigManager configManager = plugin.getConfigManager();
-        World.Environment env = event.getPlayer().getWorld().getEnvironment();
 
         switch (env) {
             case NORMAL:
@@ -78,8 +91,6 @@ public final class CheckpointListener implements Listener {
                 if (isSoulCampfire && !configManager.isDimentionEnabledEndSoul()) return;
                 break;
         }
-
-        Player player = event.getPlayer();
 
         // Only allow checkpoint creation if player is sneaking (crouching) or has an empty hand
         // This is required to fix food cooking on campfire and extinguishing it with a splash water bottle

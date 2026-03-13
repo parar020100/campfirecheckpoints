@@ -21,6 +21,7 @@ public final class ConfigManager {
     private boolean overworldEnableSoulCampfires;
     private boolean netherEnableSoulCampfires;
     private boolean endEnableSoulCampfires;
+    private boolean respawnAnchorsEnabled;
 
     private int radius;
     private int soulRadius;
@@ -53,6 +54,7 @@ public final class ConfigManager {
     private static final RespawnPriority DEFAULT_RESPAWN_PRIORITY = RespawnPriority.CHECKPOINT;
     private static final boolean DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED = true;
     private static final boolean DEFAULT_DELETE_COMMAND_ALLOWED = true;
+    private static final boolean DEFAULT_RESPAWN_ANCHORS_ENABLED = false;
 
     public ConfigManager(@NotNull CampfireCheckpoints plugin) {
         this.plugin = plugin;
@@ -70,6 +72,7 @@ public final class ConfigManager {
         this.overworldEnableSoulCampfires = config.getBoolean("enable-soul-overworld", DEFAULT_DIMENTION_OVERWORLD_SOUL);
         this.netherEnableSoulCampfires = config.getBoolean("enable-soul-nether", DEFAULT_DIMENTION_NETHER_SOUL);
         this.endEnableSoulCampfires = config.getBoolean("enable-soul-end", DEFAULT_DIMENTION_END_SOUL);
+        this.respawnAnchorsEnabled = config.getBoolean("enable-respawn-anchors", DEFAULT_RESPAWN_ANCHORS_ENABLED);
 
         // Load radius
         this.radius = config.getInt("radius", DEFAULT_RADIUS);
@@ -221,5 +224,9 @@ public final class ConfigManager {
 
     public boolean isDeleteCommandAllowed() {
         return deleteCommandAllowed;
+    }
+
+    public boolean RespawnAnchorsEnabled() {
+        return respawnAnchorsEnabled;
     }
 }
