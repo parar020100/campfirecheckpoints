@@ -653,7 +653,8 @@ public final class CheckpointListener implements Listener {
         Block block = event.getBlock();
         Material type = block.getType();
 
-        if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE) {
+        // Handle campfire and respawn anchor checkpoints
+        if (type != Material.CAMPFIRE && type != Material.SOUL_CAMPFIRE && type != Material.RESPAWN_ANCHOR) {
             return;
         }
 
@@ -664,10 +665,11 @@ public final class CheckpointListener implements Listener {
 
         if (checkpoint != null) {
             Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
+            String checkpointType = checkpoint.isAnchor() ? "respawn anchor" : "campfire checkpoint";
             if (owner != null && owner.isOnline()) {
-                MessageUtil.send(owner, "&cYour campfire checkpoint at &f(" + 
-                    blockLocation.getBlockX() + ", " + 
-                    blockLocation.getBlockY() + ", " + 
+                MessageUtil.send(owner, "&cYour " + checkpointType + " at &f(" +
+                    blockLocation.getBlockX() + ", " +
+                    blockLocation.getBlockY() + ", " +
                     blockLocation.getBlockZ() + ") &chas been destroyed!");
             }
 
