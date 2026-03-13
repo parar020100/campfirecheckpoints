@@ -104,6 +104,8 @@ public final class CheckpointListener implements Listener {
 
         CheckpointManager checkpointManager = plugin.getCheckpointManager();
 
+        checkpointManager.validateAllCheckpoints(playerUUID);
+
         if (checkpointManager.hasCheckpointAt(playerUUID, blockLocation)) {
             MessageUtil.send(player, "&eYou already have a checkpoint at this campfire!");
             event.setCancelled(true);

@@ -81,6 +81,8 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         CheckpointManager manager = plugin.getCheckpointManager();
         List<Checkpoint> checkpoints = manager.getPlayerCheckpoints(player.getUniqueId());
 
+        manager.validateAllCheckpoints(player.getUniqueId());
+
         if (checkpoints.isEmpty()) {
             MessageUtil.send(player, "&eYou have no checkpoints set.");
             MessageUtil.send(player, "&7Right-click a lit campfire to set one!");

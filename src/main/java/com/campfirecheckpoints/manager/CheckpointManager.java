@@ -480,6 +480,11 @@ public final class CheckpointManager {
         }
         for (Checkpoint checkpoint : toRemove) {
             removeCheckpointAt(checkpoint.getBlockLocation());
+            // Notify owner if online
+            Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
+            if (owner != null && owner.isOnline()) {
+                MessageUtil.send(owner, "&eYour campfire checkpoint at &f" + checkpoint.getLocationKey() + " &chas been broken.");
+            }
         }
         if (!toRemove.isEmpty() || extinguished > 0) {
             markDirty();
@@ -516,10 +521,20 @@ public final class CheckpointManager {
                         if (checkpoint.isLit()) {
                             setCheckpointLit(checkpoint, false);
                             result.extinguished++;
+                            // Notify owner about extinguished checkpoint
+                            Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
+                            if (owner != null && owner.isOnline()) {
+                                MessageUtil.send(owner, "&eYour campfire checkpoint at &f" + checkpoint.getLocationKey() + " &chas been extinguished.");
+                            }
                         }
                     } else {
                         if (!checkpoint.isLit()) {
                             setCheckpointLit(checkpoint, true);
+                            // Notify owner about relit checkpoint
+                            Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
+                            if (owner != null && owner.isOnline()) {
+                                MessageUtil.send(owner, "&eYour campfire checkpoint at &f" + checkpoint.getLocationKey() + " &ahas been relit.");
+                            }
                         }
                     }
                 } else {
