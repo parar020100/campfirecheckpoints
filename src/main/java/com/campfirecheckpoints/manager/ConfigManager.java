@@ -32,6 +32,7 @@ public final class ConfigManager {
     private int maxCheckpointsPerPlayer;
     private @NotNull RespawnPriority respawnPriority;
     private boolean emptyHandOrSneakRequired;
+    private boolean deleteCommandAllowed;
 
     // Default values
     private static final boolean DEFAULT_DIMENTION_OVERWORLD = true;
@@ -51,6 +52,7 @@ public final class ConfigManager {
     private static final int DEFAULT_MAX_CHECKPOINTS = 0; // 0 = unlimited
     private static final RespawnPriority DEFAULT_RESPAWN_PRIORITY = RespawnPriority.CHECKPOINT;
     private static final boolean DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED = true;
+    private static final boolean DEFAULT_DELETE_COMMAND_ALLOWED = true;
 
     public ConfigManager(@NotNull CampfireCheckpoints plugin) {
         this.plugin = plugin;
@@ -128,6 +130,9 @@ public final class ConfigManager {
         // Load empty-hand-or-sneak-required
         this.emptyHandOrSneakRequired = config.getBoolean("require-empty-hand-or-sneak",
                                                           DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED);
+
+        // Load delete-command-allowed
+        this.deleteCommandAllowed = config.getBoolean("allow-delete-command", DEFAULT_DELETE_COMMAND_ALLOWED);
 
         plugin.getLogger().info("Configuration loaded " +
             "- Regular campfires enabled (overworld): " + overworldEnableRegularCampfires +
@@ -212,5 +217,9 @@ public final class ConfigManager {
 
     public boolean isEmptyHandOrSneakRequired() {
         return emptyHandOrSneakRequired;
+    }
+
+    public boolean isDeleteCommandAllowed() {
+        return deleteCommandAllowed;
     }
 }

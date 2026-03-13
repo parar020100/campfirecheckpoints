@@ -60,3 +60,6 @@ respawn-priority: checkpoint
 # If true, players must be sneaking (crouching) or have an empty hand to set a checkpoint.
 # This prevents accidental checkpoint creation when cooking food or extinguishing a campfire with a splash water bottle.
 require-empty-hand-or-sneak: true
+
+# If false, the /cc delete command will be disabled and hidden from the command list.
+allow-delete-command: true

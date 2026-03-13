@@ -42,8 +42,10 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        ConfigManager configManager = plugin.getConfigManager();
+
         if (args.length == 0) {
-            showHelp(player);
+            showHelp(player, configManager);
             return true;
         }
 
@@ -51,19 +53,27 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         switch (subCommand) {
             case "list" -> handleList(player);
-            case "delete" -> handleDelete(player, args);
+            case "delete" -> {
+                if (configManager.isDeleteCommandAllowed()) {
+                    handleDelete(player, args);
+                } else {
+                    MessageUtil.send(player, "&cThe delete command is disabled by the server configuration.");
+                }
+            }
             case "reload" -> handleReload(player);
             case "info" -> handleInfo(player);
-            default -> showHelp(player);
+            default -> showHelp(player, configManager);
         }
 
         return true;
     }
 
-    private void showHelp(@NotNull Player player) {
+    private void showHelp(@NotNull Player player, ConfigManager configManager) {
         MessageUtil.send(player, "&6&l=== Campfire Checkpoints ===");
         MessageUtil.send(player, "&e/cc list &7- List your checkpoints");
-        MessageUtil.send(player, "&e/cc delete <index> &7- Delete a checkpoint");
+        if (configManager.isDeleteCommandAllowed()) {
+            MessageUtil.send(player, "&e/cc delete <index> &7- Delete a checkpoint");
+        }
         MessageUtil.send(player, "&e/cc info &7- Show plugin info");
         if (player.hasPermission("campfirecheckpoints.reload")) {
             MessageUtil.send(player, "&e/cc reload &7- Reload configuration");
@@ -112,7 +122,9 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
             MessageUtil.send(player, "    &7Created: " + date);
         }
 
-        MessageUtil.send(player, "&7Use &e/cc delete <index> &7to remove a checkpoint.");
+        if (plugin.getConfigManager().isDeleteCommandAllowed()) {
+            MessageUtil.send(player, "&7Use &e/cc delete <index> &7to remove a checkpoint.");
+        }
     }
 
     private void handleDelete(@NotNull Player player, @NotNull String[] args) {
@@ -211,8 +223,13 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
             return null;
         }
 
+        ConfigManager configManager = plugin.getConfigManager();
+
         if (args.length == 1) {
-            List<String> completions = new ArrayList<>(Arrays.asList("list", "delete", "info"));
+            List<String> completions = new ArrayList<>(List.of("list", "info"));
+            if (configManager.isDeleteCommandAllowed()) {
+                completions.add("delete");
+            }
             if (player.hasPermission("campfirecheckpoints.reload")) {
                 completions.add("reload");
             }
@@ -221,7 +238,7 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
                 .collect(Collectors.toList());
         }
 
-        if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
+        if (args.length == 2 && args[0].equalsIgnoreCase("delete") && configManager.isDeleteCommandAllowed()) {
             int checkpointCount = plugin.getCheckpointManager()
                 .getPlayerCheckpoints(player.getUniqueId()).size();
 
