@@ -115,7 +115,13 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
                 "&cUnknown";
             String world = cp.getWorldName().replace("world_", "");
             String date = dateFormat.format(new Date(cp.getCreatedAt()));
-            String type = cp.isSoul() ? " &9(soul)" : "";
+
+            String type = "";
+            if (cp.isSoul()) {
+                type += " &9(soul)";
+            } else if (cp.isAnchor()) {
+                type += " &d(anchor)";
+            }
 
             MessageUtil.send(player, "&e[" + i + "] " + status + type + " &7| " + coords + 
                 " &7(" + world + ")");
@@ -197,16 +203,25 @@ public final class CheckpointCommand implements CommandExecutor, TabCompleter {
         MessageUtil.send(player, "&eYour Checkpoints: &f" + playerCount + 
             (max > 0 ? " / " + max : ""));
         MessageUtil.send(player, "&eTotal Checkpoints: &f" + totalCount);
+
         MessageUtil.send(player, "&eRegular campfires enabled (overworld): &f" + configManager.isDimentionEnabledOverworld());
         MessageUtil.send(player, "&eRegular campfires enabled (nether): &f" + configManager.isDimentionEnabledNether());
         MessageUtil.send(player, "&eRegular campfires enabled (the end): &f" + configManager.isDimentionEnabledEnd());
+
         MessageUtil.send(player, "&eSoul campfires enabled (overworld): &f" + configManager.isDimentionEnabledOverworldSoul());
         MessageUtil.send(player, "&eSoul campfires enabled (nether): &f" + configManager.isDimentionEnabledNetherSoul());
         MessageUtil.send(player, "&eSoul campfires enabled (the end): &f" + configManager.isDimentionEnabledEndSoul());
+
+        MessageUtil.send(player, "&eRespawn anchors enabled (overworld): &f" + configManager.isDimentionEnabledOverworldAnchor());
+        MessageUtil.send(player, "&eRespawn anchors enabled (nether): &f" + configManager.isDimentionEnabledNetherAnchor());
+        MessageUtil.send(player, "&eRespawn anchors enabled (the end): &f" + configManager.isDimentionEnabledEndAnchor());
+
         MessageUtil.send(player, "&eRadius (regular campfires): &f" + configManager.getRadius() + " blocks");
         MessageUtil.send(player, "&eRadius (soul campfires): &f" + configManager.getSoulRadius() + " blocks");
+
         MessageUtil.send(player, "&eMin. distance between checkpoints: &f" + configManager.getMinDistance() + " blocks");
         MessageUtil.send(player, "&eMin. distance between checkpoints (soul): &f" + configManager.getSoulMinDistance() + " blocks");
+
         MessageUtil.send(player, "&eExtinguish on Respawn: &f" + configManager.isExtinguishOnRespawn());
         MessageUtil.send(player, "&eConfirmation Timeout: &f" + 
             configManager.getOverrideConfirmationTimeout() + "s");
