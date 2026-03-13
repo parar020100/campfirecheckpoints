@@ -571,29 +571,44 @@ public final class CheckpointManager {
     }
 
 
+    /*
+     * Deletes all respawn-anchor checkpoints for the given player.
+     * This is done in one pass and keeps {@link #locationIndex} in sync.
+     */
     public void removeAnchorCheckpoints(@NotNull UUID playerUUID) {
         List<Checkpoint> checkpoints = playerCheckpoints.get(playerUUID);
         if (checkpoints == null) {
             return;
         }
-        List<Checkpoint> toRemove = new ArrayList<>();
+
+        boolean removedAny = false;
+
         synchronized (checkpoints) {
-            for (Checkpoint checkpoint : checkpoints) {
-                if (checkpoint.isAnchor()) {
-                    toRemove.add(checkpoint);
+            for (Iterator<Checkpoint> it = checkpoints.iterator(); it.hasNext(); ) {
+                Checkpoint cp = it.next();
+                if (cp == null || !cp.isAnchor()) {
+                    continue;
+                }
+
+                locationIndex.remove(cp.getLocationKey());
+                it.remove();
+                removedAny = true;
+
+                Player owner = Bukkit.getPlayer(playerUUID);
+                if (owner != null && owner.isOnline()) {
+                    MessageUtil.send(owner, "&eYour anchor checkpoint at &f"
+                                     + cp.getLocationKey() + " &chas been removed.");
+                    plugin.getLogger().info("[Player] Removed anchor checkpoint at &f" + 
+                                            cp.getLocationKey() + " &7for " + playerUUID + ".");
                 }
             }
-        }
-        for (Checkpoint checkpoint : toRemove) {
-            removeCheckpointAt(checkpoint.getBlockLocation());
 
-            Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
-            if (owner != null && owner.isOnline()) {
-                MessageUtil.send(owner, "&eYour anchor checkpoint at &f" + checkpoint.getLocationKey() + " &chas been removed.");
-                plugin.getLogger().info("[Player] Removed anchor checkpoint at &f" + checkpoint.getLocationKey() + " &7for " + playerUUID + ".");
+            if (checkpoints.isEmpty()) {
+                playerCheckpoints.remove(playerUUID);
             }
         }
-        if (!toRemove.isEmpty()) {
+
+        if (removedAny) {
             markDirty();
         }
     }
