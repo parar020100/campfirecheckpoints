@@ -54,6 +54,13 @@ public final class CheckpointListener implements Listener {
             return;
         }
 
+        // If player interacts with a bed, clear their respawn-anchor checkpoint(s),
+        // but do not cancel the bed interaction.
+        if (clickedBlock.getBlockData() instanceof org.bukkit.block.data.type.Bed) {
+            plugin.getCheckpointManager().removeAnchorCheckpoints(event.getPlayer().getUniqueId());
+            return;
+        }
+
         Material type = clickedBlock.getType();
         boolean isRegularCampfire = (type == Material.CAMPFIRE);
         boolean isSoulCampfire = (type == Material.SOUL_CAMPFIRE);
