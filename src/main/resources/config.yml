@@ -65,6 +65,14 @@ require-empty-hand-or-sneak: true
 # If false, the /cc delete command will be disabled and hidden from the list.
 allow-delete-command: true
 
-# Make respawn anchors function as checkpoints, allowing players to set their
-# spawn point without losing the spawnpoint set by a bed.
+# Override respawn anchors, making them function as checkpoints to allow
+# setting global spawnpoints without losing the spawnpoint set by a bed.
+# Respawn anchors don't have radius and minimal distance checks.
+# You can only have one respawn anchor checkpoint per player.
+# If another respawn anchor checkpoint is set, the old one will be deleted.
 enable-respawn-anchors: false
+
+# Per-dimension overrides for respawn anchors. Only work if enable-respawn-anchors is true.
+enable-respawn-anchors-overworld: false
+enable-respawn-anchors-nether: true
+enable-respawn-anchors-end: false
