@@ -196,13 +196,13 @@ public final class ConfigManager {
         return endEnableSoulCampfires;
     }
 
-    public boolean isRespawnAnchorEnabledOverworld() {
+    public boolean isDimentionEnabledOverworldAnchor() {
         return respawnAnchorsEnabled && overworldRespawnAnchorsEnabled;
     }
-    public boolean isRespawnAnchorEnabledNether() {
+    public boolean isDimentionEnabledNetherAnchor() {
         return respawnAnchorsEnabled && netherRespawnAnchorsEnabled;
     }
-    public boolean isRespawnAnchorEnabledEnd() {
+    public boolean isDimentionEnabledEndAnchor() {
         return respawnAnchorsEnabled && endRespawnAnchorsEnabled;
     }
 

@@ -11,6 +11,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Lightable;
+import org.bukkit.block.data.type.RespawnAnchor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -65,11 +66,67 @@ public final class CheckpointListener implements Listener {
         // Deny respawn anchor spawnpoint in Nether unless enabled, but allow charging with glowstone
         if (isRespawnAnchor && configManager.RespawnAnchorsEnabled()) {
             Material itemInHand = player.getInventory().getItemInMainHand().getType();
-            if (env == World.Environment.NETHER && itemInHand != Material.GLOWSTONE) {
-                event.setCancelled(true);
-                MessageUtil.send(player, "&cSetting respawn anchor spawnpoint in Nether is disabled by this plugin!");
+
+            if (itemInHand == Material.GLOWSTONE) {
                 return;
             }
+
+            if (env == World.Environment.NORMAL && !configManager.isDimentionEnabledOverworldAnchor()) {
+                MessageUtil.send(player, "&cSetting respawn anchors as checkpoints is not allowed in the Overworld.");
+                event.setCancelled(true);
+                return;
+            }
+
+            if (env == World.Environment.NETHER && !configManager.isDimentionEnabledNetherAnchor()) {
+                MessageUtil.send(player, "&cSetting respawn anchors as checkpoints is not allowed in the Nether.");
+                event.setCancelled(true);
+                return;
+            }
+
+            if (env == World.Environment.THE_END && !configManager.isDimentionEnabledEndAnchor()) {
+                MessageUtil.send(player, "&cSetting respawn anchors as checkpoints is not allowed in the End.");
+                event.setCancelled(true);
+                return;
+            }
+
+            // Create checkpoint on respawn anchor
+            UUID playerUUID = player.getUniqueId();
+            Location blockLocation = clickedBlock.getLocation();
+            CheckpointManager checkpointManager = plugin.getCheckpointManager();
+
+            checkpointManager.validateAllCheckpoints(playerUUID);
+
+            if (checkpointManager.hasCheckpointAt(playerUUID, blockLocation)) {
+                MessageUtil.send(player, "&eYou already have a checkpoint at this respawn anchor!");
+                event.setCancelled(true);
+                return;
+            }
+
+            // Check for charge state and prevent setting checkpoint on uncharged anchor
+            BlockData blockData = clickedBlock.getBlockData();
+            if (blockData instanceof RespawnAnchor anchorData) {
+                if (anchorData.getCharges() <= 0) {
+                    MessageUtil.send(player, "&cThis respawn anchor is uncharged! Charge it with glowstone to set a checkpoint.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            // Remove all other anchor checkpoints, there can be only one per player
+            checkpointManager.removeAnchorCheckpoints(playerUUID);
+
+            Checkpoint newCheckpoint = new Checkpoint(playerUUID, blockLocation);
+            checkpointManager.addCheckpoint(playerUUID, newCheckpoint);
+
+            String worldName = blockLocation.getWorld() != null ? blockLocation.getWorld().getName().replace("world_", "") : "unknown";
+            MessageUtil.send(player, "&aCheckpoint set at respawn anchor &f("
+                             + blockLocation.getBlockX() + ", "
+                             + blockLocation.getBlockY() + ", "
+                             + blockLocation.getBlockZ() + ", "
+                             + worldName + ")&a!");
+
+            event.setCancelled(true);
+
         }
 
         if (!isRegularCampfire && !isSoulCampfire) {
@@ -92,21 +149,21 @@ public final class CheckpointListener implements Listener {
                 break;
         }
 
+
+
+        Material itemInHand = player.getInventory().getItemInMainHand().getType();
+
         // Only allow checkpoint creation if player is sneaking (crouching) or has an empty hand
         // This is required to fix food cooking on campfire and extinguishing it with a splash water bottle
         if (configManager.isEmptyHandOrSneakRequired()) {
-            boolean isEmptyHand = player.getInventory().getItemInMainHand().getType() == Material.AIR;
-            if (!player.isSneaking() && !isEmptyHand) {
+            if (!player.isSneaking() && itemInHand != Material.AIR) {
                 return;
             }
-        }
-
-        if (!player.hasPermission("campfirecheckpoints.use")) {
+        } else if (isInteractItem(itemInHand)) {
             return;
         }
 
-        Material itemInHand = player.getInventory().getItemInMainHand().getType();
-        if (isInteractItem(itemInHand)) {
+        if (!player.hasPermission("campfirecheckpoints.use")) {
             return;
         }
 
@@ -176,7 +233,12 @@ public final class CheckpointListener implements Listener {
         if (!checkpointManager.canCreateCheckpoint(playerUUID)) {
             int max = configManager.getMaxCheckpointsPerPlayer();
             MessageUtil.send(player, "&cYou have reached the maximum number of checkpoints (" + max + ")!");
-            MessageUtil.send(player, "&7Use &e/cc delete <index> &7to remove an old checkpoint first.");
+
+            if (configManager.isDeleteCommandAllowed()) {
+                MessageUtil.send(player, "&7Use &e/cc delete <index> &7to remove an old checkpoint first.");
+            } else {
+                MessageUtil.send(player, "&7You need to break an old checkpoint before creating a new one.");
+            }
             event.setCancelled(true);
             return;
         }
@@ -412,12 +474,53 @@ public final class CheckpointListener implements Listener {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAnchorChargeOrDischarge(org.bukkit.event.block.BlockPhysicsEvent event) {
+        Block block = event.getBlock();
+
+        if (block.getType() != Material.RESPAWN_ANCHOR) {
+            return;
+        }
+
+        Location blockLoc = block.getLocation();
+        Checkpoint checkpoint = plugin.getCheckpointManager().getCheckpointAt(blockLoc);
+        if (checkpoint == null) return;
+
+        BlockData data = block.getBlockData();
+        int charge = -1;
+        if (data instanceof org.bukkit.block.data.type.RespawnAnchor anchorData) {
+            charge = anchorData.getCharges();
+        }
+
+        boolean wasLit = checkpoint.isLit();
+        boolean isNowLit = charge > 0;
+
+        if (wasLit != isNowLit) {
+            checkpoint.setLit(isNowLit);
+            plugin.getCheckpointManager().setCheckpointLit(checkpoint, isNowLit);
+            Player owner = Bukkit.getPlayer(checkpoint.getOwnerUUID());
+            if (owner != null && owner.isOnline()) {
+                if (isNowLit) {
+                    MessageUtil.send(owner, "&aYour respawn anchor checkpoint at &f(" +
+                            blockLoc.getBlockX() + ", " +
+                            blockLoc.getBlockY() + ", " +
+                            blockLoc.getBlockZ() + ") &ahas been charged!");
+                } else {
+                    MessageUtil.send(owner, "&eYour respawn anchor checkpoint at &f(" +
+                            blockLoc.getBlockX() + ", " +
+                            blockLoc.getBlockY() + ", " +
+                            blockLoc.getBlockZ() + ") &ehas no charge left!");
+                }
+            }
+        }
+    }
+
     private void handleCheckpointRespawn(
             @NotNull Checkpoint checkpoint,
             @NotNull CheckpointManager checkpointManager,
             @NotNull ConfigManager configManager) {
 
-        if (configManager.isExtinguishOnRespawn()) {
+        if (configManager.isExtinguishOnRespawn() || checkpoint.isAnchor()) {
             Location blockLoc = checkpoint.getBlockLocation();
             if (blockLoc != null && blockLoc.getWorld() != null) {
                 Block campfireBlock = blockLoc.getBlock();
@@ -427,6 +530,15 @@ public final class CheckpointListener implements Listener {
                     lightable.setLit(false);
                     campfireBlock.setBlockData(lightable);
                     checkpointManager.setCheckpointLit(checkpoint, false);
+                } else if (checkpoint.isAnchor() && blockData instanceof RespawnAnchor anchorData) {
+                    int charges = anchorData.getCharges() - 1;
+                    anchorData.setCharges(charges);
+                    campfireBlock.setBlockData(anchorData);
+
+                    if (charges <= 0) {
+                        checkpoint.setLit(false);
+                        checkpointManager.setCheckpointLit(checkpoint, false);
+                    }
                 }
             }
         }
