@@ -31,6 +31,7 @@ public final class ConfigManager {
     private int overrideConfirmationTimeout;
     private int maxCheckpointsPerPlayer;
     private @NotNull RespawnPriority respawnPriority;
+    private boolean emptyHandOrSneakRequired;
 
     // Default values
     private static final boolean DEFAULT_DIMENTION_OVERWORLD = true;
@@ -49,6 +50,7 @@ public final class ConfigManager {
     private static final int DEFAULT_OVERRIDE_TIMEOUT = 5;
     private static final int DEFAULT_MAX_CHECKPOINTS = 0; // 0 = unlimited
     private static final RespawnPriority DEFAULT_RESPAWN_PRIORITY = RespawnPriority.CHECKPOINT;
+    private static final boolean DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED = true;
 
     public ConfigManager(@NotNull CampfireCheckpoints plugin) {
         this.plugin = plugin;
@@ -122,6 +124,10 @@ public final class ConfigManager {
                 "Invalid sound '" + soundName + "' in config. Using default.");
             this.soundOnSet = DEFAULT_SOUND;
         }
+
+        // Load empty-hand-or-sneak-required
+        this.emptyHandOrSneakRequired = config.getBoolean("require-empty-hand-or-sneak",
+                                                          DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED);
 
         plugin.getLogger().info("Configuration loaded " +
             "- Regular campfires enabled (overworld): " + overworldEnableRegularCampfires +
@@ -202,5 +208,9 @@ public final class ConfigManager {
 
     public @NotNull RespawnPriority getRespawnPriority() {
         return respawnPriority;
+    }
+
+    public boolean isEmptyHandOrSneakRequired() {
+        return emptyHandOrSneakRequired;
     }
 }

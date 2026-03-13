@@ -81,6 +81,15 @@ public final class CheckpointListener implements Listener {
 
         Player player = event.getPlayer();
 
+        // Only allow checkpoint creation if player is sneaking (crouching) or has an empty hand
+        // This is required to fix food cooking on campfire and extinguishing it with a splash water bottle
+        if (configManager.isEmptyHandOrSneakRequired()) {
+            boolean isEmptyHand = player.getInventory().getItemInMainHand().getType() == Material.AIR;
+            if (!player.isSneaking() && !isEmptyHand) {
+                return;
+            }
+        }
+
         if (!player.hasPermission("campfirecheckpoints.use")) {
             return;
         }

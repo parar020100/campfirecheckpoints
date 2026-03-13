@@ -56,3 +56,7 @@ max-checkpoints-per-player: 0
 # Note: This only applies when BOTH a valid bed spawn AND a lit checkpoint
 #       are within the configured radius of the death location.
 respawn-priority: checkpoint
+
+# If true, players must be sneaking (crouching) or have an empty hand to set a checkpoint.
+# This prevents accidental checkpoint creation when cooking food or extinguishing a campfire with a splash water bottle.
+require-empty-hand-or-sneak: true
