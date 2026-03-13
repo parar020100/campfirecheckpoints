@@ -334,7 +334,7 @@ public final class CheckpointListener implements Listener {
         Checkpoint closestCheckpoint = checkpointManager.findClosestCheckpoint(playerUUID, deathLocation);
 
         double checkpointRadius = configManager.getRadius();
-        if (closestCheckpoint && closestCheckpoint.isSoul()) {
+        if (closestCheckpoint != null && closestCheckpoint.isSoul()) {
             checkpointRadius = configManager.getSoulRadius();
         }
 
