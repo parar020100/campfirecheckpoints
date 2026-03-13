@@ -128,7 +128,7 @@ public final class CheckpointListener implements Listener {
                              + blockLocation.getBlockZ() + ", "
                              + worldName + ")&a!");
 
-            player.playSound(blockLocation, Sound.RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            player.playSound(blockLocation, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_SET_SPAWN"), SoundCategory.BLOCKS, 1.0f, 1.0f);
 
             event.setCancelled(true);
 
@@ -369,9 +369,6 @@ public final class CheckpointListener implements Listener {
                 if (usedCheckpoint) {
                     if (anchor) {
                         MessageUtil.send(player, "&aYou respawned at your respawn anchor!");
-                        // Play respawn anchor spawn sound
-                        player.playSound(player.getLocation(), Sound.RESPAWN_ANCHOR_SPAWN,
-                                         SoundCategory.BLOCKS, 1.0f, 1.0f);
                     } else {
                         MessageUtil.send(player, "&aYou respawned at your campfire checkpoint!");
                         if (extinguished) {
@@ -560,7 +557,7 @@ public final class CheckpointListener implements Listener {
                         checkpointManager.setCheckpointLit(checkpoint, false);
 
                         if (blockLoc.getWorld() != null) {
-                            blockLoc.getWorld().playSound(blockLoc, Sound.RESPAWN_ANCHOR_DEPLETED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                            blockLoc.getWorld().playSound(blockLoc, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_DEPLETE"), SoundCategory.BLOCKS, 1.0f, 1.0f);
                         }
                     }
                 }
