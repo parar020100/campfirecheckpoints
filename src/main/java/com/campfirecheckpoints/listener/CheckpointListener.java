@@ -360,9 +360,8 @@ public final class CheckpointListener implements Listener {
         final boolean usedBed = respawnResult.isBed;
         final boolean extinguished = respawnResult.isCheckpoint && configManager.isExtinguishOnRespawn();
 
-        Checkpoint respawnCheckpoint = respawnResult.checkpoint;
-        boolean anchor = respawnCheckpoint.isAnchor();
-
+        final @Nullable Checkpoint respawnCheckpoint = respawnResult.checkpoint;
+        final boolean anchor = respawnCheckpoint != null && respawnCheckpoint.isAnchor();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
@@ -552,13 +551,14 @@ public final class CheckpointListener implements Listener {
                     anchorData.setCharges(charges);
                     campfireBlock.setBlockData(anchorData);
 
+                    if (blockLoc.getWorld() != null) {
+                        blockLoc.getWorld().playSound(blockLoc, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_DEPLETE"),
+                                                      SoundCategory.BLOCKS, 1.0f, 1.0f);
+                    }
+
                     if (charges <= 0) {
                         checkpoint.setLit(false);
                         checkpointManager.setCheckpointLit(checkpoint, false);
-
-                        if (blockLoc.getWorld() != null) {
-                            blockLoc.getWorld().playSound(blockLoc, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_DEPLETE"), SoundCategory.BLOCKS, 1.0f, 1.0f);
-                        }
                     }
                 }
             }
