@@ -350,8 +350,17 @@ public final class CheckpointListener implements Listener {
 
         // Find anchor checkpoint for this player, if any
         Checkpoint anchorCheckpoint = checkpointManager.findAnchorCheckpoint(playerUUID);
-        Location anchorSpawn = (anchorCheckpoint != null) ? anchorCheckpoint.getSpawnLocation() : null;
-        boolean hasAnchorSpawn = anchorSpawn != null && anchorSpawn.getWorld() != null;
+        Location anchorSpawn = null;
+        boolean hasAnchorSpawn = false;
+
+        if (anchorCheckpoint.isLit()) {
+            // if anchor is lit, we can consider it as a respawn point
+            anchorSpawn = (anchorCheckpoint != null) ? anchorCheckpoint.getSpawnLocation() : null;
+            hasAnchorSpawn = anchorSpawn != null && anchorSpawn.getWorld() != null;
+        } else {
+            // if anchor is not lit, we should ignore it for respawn purposes
+            anchorCheckpoint = null;
+        }
 
         RespawnResult respawnResult = determineRespawnLocation(
             closestCheckpoint,
