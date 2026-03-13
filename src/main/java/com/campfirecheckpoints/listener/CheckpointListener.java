@@ -125,6 +125,8 @@ public final class CheckpointListener implements Listener {
                              + blockLocation.getBlockZ() + ", "
                              + worldName + ")&a!");
 
+            player.playSound(blockLocation, Sound.RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
+
             event.setCancelled(true);
 
         }
@@ -332,10 +334,10 @@ public final class CheckpointListener implements Listener {
         boolean hasBedSpawn = bedSpawn != null && event.isBedSpawn();
 
         RespawnResult respawnResult = determineRespawnLocation(
-            closestCheckpoint, 
-            bedSpawn, 
-            hasBedSpawn, 
-            deathLocation, 
+            closestCheckpoint,
+            bedSpawn,
+            hasBedSpawn,
+            deathLocation,
             configManager.getRespawnPriority(),
             configManager.getRadius()
         );
@@ -355,12 +357,22 @@ public final class CheckpointListener implements Listener {
         final boolean usedBed = respawnResult.isBed;
         final boolean extinguished = respawnResult.isCheckpoint && configManager.isExtinguishOnRespawn();
 
+        Checkpoint respawnCheckpoint = respawnResult.checkpoint;
+        boolean anchor = respawnCheckpoint.isAnchor();
+
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 if (usedCheckpoint) {
-                    MessageUtil.send(player, "&aYou respawned at your campfire checkpoint!");
-                    if (extinguished) {
-                        MessageUtil.send(player, "&7The campfire has been extinguished. Use Flint & Steel to relight it.");
+                    if (anchor) {
+                        MessageUtil.send(player, "&aYou respawned at your respawn anchor!");
+                        // Play respawn anchor spawn sound
+                        player.playSound(player.getLocation(), Sound.RESPAWN_ANCHOR_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f); ///
+                    } else {
+                        MessageUtil.send(player, "&aYou respawned at your campfire checkpoint!");
+                        if (extinguished) {
+                            MessageUtil.send(player, "&7The campfire has been extinguished. Use Flint & Steel to relight it.");
+                        }
                     }
                 } else if (usedBed) {
                 }
@@ -520,7 +532,9 @@ public final class CheckpointListener implements Listener {
             @NotNull CheckpointManager checkpointManager,
             @NotNull ConfigManager configManager) {
 
-        if (configManager.isExtinguishOnRespawn() || checkpoint.isAnchor()) {
+        boolean anchor = checkpoint.isAnchor();
+
+        if (configManager.isExtinguishOnRespawn() || anchor) {
             Location blockLoc = checkpoint.getBlockLocation();
             if (blockLoc != null && blockLoc.getWorld() != null) {
                 Block campfireBlock = blockLoc.getBlock();
@@ -530,7 +544,8 @@ public final class CheckpointListener implements Listener {
                     lightable.setLit(false);
                     campfireBlock.setBlockData(lightable);
                     checkpointManager.setCheckpointLit(checkpoint, false);
-                } else if (checkpoint.isAnchor() && blockData instanceof RespawnAnchor anchorData) {
+
+                } else if (anchor && blockData instanceof RespawnAnchor anchorData) {
                     int charges = anchorData.getCharges() - 1;
                     anchorData.setCharges(charges);
                     campfireBlock.setBlockData(anchorData);
@@ -538,6 +553,10 @@ public final class CheckpointListener implements Listener {
                     if (charges <= 0) {
                         checkpoint.setLit(false);
                         checkpointManager.setCheckpointLit(checkpoint, false);
+
+                        if (blockLoc.getWorld() != null) {
+                            blockLoc.getWorld().playSound(blockLoc, Sound.RESPAWN_ANCHOR_DEPLETED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                        }
                     }
                 }
             }
