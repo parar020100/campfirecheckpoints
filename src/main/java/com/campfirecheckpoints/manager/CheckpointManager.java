@@ -357,6 +357,10 @@ public final class CheckpointManager {
             synchronized (checkpoints) {
                 for (Checkpoint checkpoint : checkpoints) {
                     if (checkpoint.isWithinRadius(pending.newLocation, pending.radius)) {
+                        if (checkpoint.isAnchor()) {
+                            // Don't allow override to remove anchor checkpoints
+                            continue;
+                        }
                         toRemove.add(checkpoint);
                         keysToRemove.add(checkpoint.getLocationKey());
                     }
