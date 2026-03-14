@@ -27,6 +27,8 @@ public final class ConfigManager {
     private boolean netherRespawnAnchorsEnabled;
     private boolean endRespawnAnchorsEnabled;
 
+    private boolean vanillaRespawnAnchorsNether;
+
     private int radius;
     private int soulRadius;
     private int minDistance;
@@ -64,27 +66,35 @@ public final class ConfigManager {
     private static final boolean DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED = true;
     private static final boolean DEFAULT_DELETE_COMMAND_ALLOWED = true;
     private static final boolean DEFAULT_RESPAWN_ANCHORS_ENABLED = false;
+    private static final boolean DEFAULT_VANILLA_RESPAWN_ANCHORS_NETHER = false;
 
     public ConfigManager(@NotNull CampfireCheckpoints plugin) {
         this.plugin = plugin;
         this.soundOnSet = DEFAULT_SOUND;
         this.soundOnRespawn = DEFAULT_SOUND_ON_RESPAWN;
         this.respawnPriority = DEFAULT_RESPAWN_PRIORITY;
+        this.vanillaRespawnAnchorsNether = DEFAULT_VANILLA_RESPAWN_ANCHORS_NETHER;
         reload();
     }
 
     public void reload() {
         FileConfiguration config = plugin.getConfig();
 
-        this.overworldEnableRegularCampfires = config.getBoolean("enable-overworld", DEFAULT_DIMENTION_OVERWORLD);
-        this.netherEnableRegularCampfires = config.getBoolean("enable-nether", DEFAULT_DIMENTION_NETHER);
-        this.endEnableRegularCampfires = config.getBoolean("enable-end", DEFAULT_DIMENTION_END);
+        this.overworldEnableRegularCampfires = config.getBoolean("enable-regular-overworld", DEFAULT_DIMENTION_OVERWORLD);
+        this.netherEnableRegularCampfires = config.getBoolean("enable-regular-nether", DEFAULT_DIMENTION_NETHER);
+        this.endEnableRegularCampfires = config.getBoolean("enable-regular-end", DEFAULT_DIMENTION_END);
 
         this.overworldEnableSoulCampfires = config.getBoolean("enable-soul-overworld", DEFAULT_DIMENTION_OVERWORLD_SOUL);
         this.netherEnableSoulCampfires = config.getBoolean("enable-soul-nether", DEFAULT_DIMENTION_NETHER_SOUL);
         this.endEnableSoulCampfires = config.getBoolean("enable-soul-end", DEFAULT_DIMENTION_END_SOUL);
 
         this.respawnAnchorsEnabled = config.getBoolean("enable-respawn-anchors", DEFAULT_RESPAWN_ANCHORS_ENABLED);
+
+        // Vanilla respawn anchor mechanics toggle for Nether (only makes sense if anchors are enabled)
+        this.vanillaRespawnAnchorsNether = config.getBoolean(
+                "vanilla-respawn-anchors-in-nether",
+                DEFAULT_VANILLA_RESPAWN_ANCHORS_NETHER
+        );
 
         if (this.respawnAnchorsEnabled) {
             this.overworldRespawnAnchorsEnabled = config.getBoolean("enable-respawn-anchors-overworld", DEFAULT_DIMENTION_OVERWORLD_ANCHOR);
@@ -179,6 +189,7 @@ public final class ConfigManager {
             ", Respawn anchors enabled (overworld): " + overworldRespawnAnchorsEnabled +
             ", Respawn anchors enabled (nether): " + netherRespawnAnchorsEnabled +
             ", Respawn anchors enabled (end): " + endRespawnAnchorsEnabled +
+            ", Vanilla respawn anchors (nether): " + vanillaRespawnAnchorsNether +
             ", Radius: " + radius +
             ", Radius (soul campfires): " + soulRadius +
             ", Min. distance: " + minDistance +
@@ -278,5 +289,9 @@ public final class ConfigManager {
 
     public boolean RespawnAnchorsEnabled() {
         return respawnAnchorsEnabled;
+    }
+
+    public boolean vanillaAnchorsEnabledInNether() {
+        return vanillaRespawnAnchorsNether;
     }
 }

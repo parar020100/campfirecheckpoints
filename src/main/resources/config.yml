@@ -81,3 +81,11 @@ enable-respawn-anchors: false
 enable-respawn-anchors-overworld: false
 enable-respawn-anchors-nether: true
 enable-respawn-anchors-end: false
+
+# By default, this plugin removes the vanilla respawn anchor mechanics
+# Set this to true if you want respawn anchors to function in the Nether
+# with vanilla-style (overriding the bed spawn point)
+#
+# NOTE: This doesn't work if enable-respawn-anchors-nether is true
+# NOTE: This doesn't matter if enable-respawn-anchors is false
+vanilla-respawn-anchors-in-nether: false
