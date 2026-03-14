@@ -72,6 +72,11 @@ public final class CheckpointListener implements Listener {
 
         // Deny respawn anchor spawnpoint in Nether unless enabled, but allow charging with glowstone
         if (isRespawnAnchor && configManager.RespawnAnchorsEnabled()) {
+            // Prevent any respawn anchor logic if player is sneaking
+            if (player.isSneaking()) {
+                return;
+            }
+
             Material itemInHand = player.getInventory().getItemInMainHand().getType();
 
             if (itemInHand == Material.GLOWSTONE) {
