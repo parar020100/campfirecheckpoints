@@ -33,8 +33,13 @@ soul-campfire-min-distance: 500
 extinguish-on-respawn: true
 
 # The sound played when a checkpoint is successfully set.
+# Default: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
 # Valid sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
 sound-on-set: BLOCK_RESPAWN_ANCHOR_SET_SPAWN
+
+# The sound played when a player respawns using a checkpoint (campfire or respawn anchor).
+# Default: BLOCK_RESPAWN_ANCHOR_DEPLETE
+sound-on-respawn: BLOCK_RESPAWN_ANCHOR_DEPLETE
 
 # Time in seconds that players have to confirm overriding an existing checkpoint
 # When a player tries to set a checkpoint within radius of an existing one,

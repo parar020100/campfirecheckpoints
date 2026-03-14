@@ -491,15 +491,20 @@ public final class CheckpointListener implements Listener {
                     campfireBlock.setBlockData(lightable);
                     checkpointManager.setCheckpointLit(checkpoint, false);
 
+                    // Play configured respawn sound
+                    Sound respawnSound = configManager.getSoundOnRespawn();
+                    if (respawnSound != null) {
+                        blockLoc.getWorld().playSound(blockLoc, Sound.valueOf(respawnSound.name()),
+                                                      SoundCategory.BLOCKS, 1.0f, 1.0f);
+                    }
+
                 } else if (anchor && blockData instanceof RespawnAnchor anchorData) {
                     int charges = anchorData.getCharges() - 1;
                     anchorData.setCharges(charges);
                     campfireBlock.setBlockData(anchorData);
 
-                    if (blockLoc.getWorld() != null) {
-                        blockLoc.getWorld().playSound(blockLoc, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_DEPLETE"),
-                                                      SoundCategory.BLOCKS, 1.0f, 1.0f);
-                    }
+                    blockLoc.getWorld().playSound(blockLoc, Sound.valueOf("BLOCK_RESPAWN_ANCHOR_DEPLETE"),
+                                                  SoundCategory.BLOCKS, 1.0f, 1.0f);
 
                     if (charges <= 0) {
                         checkpoint.setLit(false);

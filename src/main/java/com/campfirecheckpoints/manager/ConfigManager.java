@@ -33,6 +33,7 @@ public final class ConfigManager {
     private int soulMinDistance;
     private boolean extinguishOnRespawn;
     private @NotNull Sound soundOnSet;
+    private @NotNull Sound soundOnRespawn;
     private int overrideConfirmationTimeout;
     private int maxCheckpointsPerPlayer;
     private @NotNull RespawnPriority respawnPriority;
@@ -56,6 +57,7 @@ public final class ConfigManager {
     private static final int DEFAULT_SOUL_MIN_DISTANCE = 500;
     private static final boolean DEFAULT_EXTINGUISH = true;
     private static final Sound DEFAULT_SOUND = Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN;
+    private static final Sound DEFAULT_SOUND_ON_RESPAWN = Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE;
     private static final int DEFAULT_OVERRIDE_TIMEOUT = 5;
     private static final int DEFAULT_MAX_CHECKPOINTS = 0; // 0 = unlimited
     private static final RespawnPriority DEFAULT_RESPAWN_PRIORITY = RespawnPriority.CHECKPOINT;
@@ -66,6 +68,7 @@ public final class ConfigManager {
     public ConfigManager(@NotNull CampfireCheckpoints plugin) {
         this.plugin = plugin;
         this.soundOnSet = DEFAULT_SOUND;
+        this.soundOnRespawn = DEFAULT_SOUND_ON_RESPAWN;
         this.respawnPriority = DEFAULT_RESPAWN_PRIORITY;
         reload();
     }
@@ -149,6 +152,16 @@ public final class ConfigManager {
             this.soundOnSet = DEFAULT_SOUND;
         }
 
+        // Load respawn sound
+        String respawnSoundName = config.getString("sound-on-respawn", DEFAULT_SOUND_ON_RESPAWN.name());
+        try {
+            this.soundOnRespawn = Sound.valueOf(respawnSoundName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING,
+                "Invalid sound-on-respawn '" + respawnSoundName + "' in config. Using default.");
+            this.soundOnRespawn = DEFAULT_SOUND_ON_RESPAWN;
+        }
+
         // Load empty-hand-or-sneak-required
         this.emptyHandOrSneakRequired = config.getBoolean("require-empty-hand-or-sneak",
                                                           DEFAULT_EMPTY_HAND_OR_SNEAK_REQUIRED);
@@ -174,7 +187,8 @@ public final class ConfigManager {
             ", Timeout: " + overrideConfirmationTimeout + "s" +
             ", MaxCheckpoints: " + (maxCheckpointsPerPlayer == 0 ? "unlimited" : maxCheckpointsPerPlayer) +
             ", RespawnPriority: " + respawnPriority.getConfigValue() +
-            ", Sound: " + soundOnSet.name());
+            ", Sound: " + soundOnSet.name() +
+            ", SoundOnRespawn: " + soundOnRespawn.name());
     }
 
     public boolean isDimentionEnabledOverworld() {
@@ -228,6 +242,10 @@ public final class ConfigManager {
 
     public @NotNull Sound getSoundOnSet() {
         return soundOnSet;
+    }
+
+    public @NotNull Sound getSoundOnRespawn() {
+        return soundOnRespawn;
     }
 
     public int getOverrideConfirmationTimeout() {
