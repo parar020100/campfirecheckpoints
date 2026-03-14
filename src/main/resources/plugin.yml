@@ -1,10 +1,10 @@
 # src/main/resources/plugin.yml
 name: CampfireCheckpoints
-version: '1.2.0-parar'
+version: '1.2.0'
 main: com.campfirecheckpoints.CampfireCheckpoints
 api-version: '1.21'
 description: A respawn system using campfires as checkpoints
-author: fbi
+author: fbi + tweaks by parar020100
 
 commands:
   cc:
