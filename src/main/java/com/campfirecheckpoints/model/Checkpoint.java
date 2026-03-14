@@ -150,9 +150,9 @@ public final class Checkpoint {
     }
 
 
-    public boolean isWithinRadius(@Nullable Location location, double radius) {
+    public boolean isWithinRadius(@Nullable Location location, double radius, boolean includeAnchors) {
         if (anchor) {
-            return true; // Respawn anchors are not affected by radius checks
+            return includeAnchors; // Respawn anchors are not affected by radius checks
         }
 
         if (location == null) {
