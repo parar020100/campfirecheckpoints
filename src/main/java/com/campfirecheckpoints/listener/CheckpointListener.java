@@ -75,6 +75,17 @@ public final class CheckpointListener implements Listener {
             Material itemInHand = player.getInventory().getItemInMainHand().getType();
 
             if (itemInHand == Material.GLOWSTONE) {
+                // Allow charging with glowstone, but prevent setting spawn if fully charged in Nether
+                if (env == World.Environment.NETHER) {
+                    BlockData blockData = clickedBlock.getBlockData();
+                    if (blockData instanceof RespawnAnchor anchorData) {
+                        if (anchorData.getCharges() >= ((RespawnAnchor) blockData).getMaximumCharges()) {
+                            // Anchor is fully charged, prevent further charging and setting spawn
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
                 return;
             }
 
