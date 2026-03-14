@@ -353,7 +353,7 @@ public final class CheckpointListener implements Listener {
         Location anchorSpawn = null;
         boolean hasAnchorSpawn = false;
 
-        if (anchorCheckpoint.isLit()) {
+        if (anchorCheckpoint != null && anchorCheckpoint.isLit()) {
             // if anchor is lit, we can consider it as a respawn point
             anchorSpawn = (anchorCheckpoint != null) ? anchorCheckpoint.getSpawnLocation() : null;
             hasAnchorSpawn = anchorSpawn != null && anchorSpawn.getWorld() != null;
@@ -483,7 +483,7 @@ public final class CheckpointListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Determines which respawn point is closer to death location
      */
     private @NotNull RespawnResult determineClosestRespawn(
@@ -497,7 +497,10 @@ public final class CheckpointListener implements Listener {
 
         double checkpointDistSq = checkpoint.distanceSquared(deathLocation);
         double bedDistSq = calculateDistanceSquared(bedSpawn, deathLocation);
-        double anchorDistSq = calculateDistanceSquared(anchorSpawn, deathLocation);
+        double anchorDistSq = Double.MAX_VALUE;
+
+        if (anchorSpawn != null)
+            anchorDistSq = calculateDistanceSquared(anchorSpawn, deathLocation);
 
         // Check if bed is in a different world
         if (bedSpawn.getWorld() == null || !bedSpawn.getWorld().equals(deathLocation.getWorld())) {
