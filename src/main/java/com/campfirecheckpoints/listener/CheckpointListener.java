@@ -339,39 +339,19 @@ public final class CheckpointListener implements Listener {
         checkpointManager.validateAllCheckpoints(playerUUID);
 
         Checkpoint closestCheckpoint = checkpointManager.findClosestCheckpoint(playerUUID, deathLocation);
+        final RespawnOption spawnAtCheckpoint = new RespawnOption(closestCheckpoint, configManager);
 
-        double checkpointRadius = configManager.getRadius();
-        if (closestCheckpoint != null && closestCheckpoint.isSoul()) {
-            checkpointRadius = configManager.getSoulRadius();
-        }
-
-        Location bedSpawn = player.getRespawnLocation();
-        boolean hasBedSpawn = bedSpawn != null && event.isBedSpawn();
+        final RespawnOption spawnAtBed = new RespawnOption(player.getRespawnLocation(),
+                                                           null, false, true, event.isBedSpawn(), configManager);
 
         // Find anchor checkpoint for this player, if any
         Checkpoint anchorCheckpoint = checkpointManager.findAnchorCheckpoint(playerUUID);
-        Location anchorSpawn = null;
-        boolean hasAnchorSpawn = false;
+        final RespawnOption spawnAtAnchor = new RespawnOption(anchorCheckpoint, configManager);
 
-        if (anchorCheckpoint != null && anchorCheckpoint.isLit()) {
-            // if anchor is lit, we can consider it as a respawn point
-            anchorSpawn = (anchorCheckpoint != null) ? anchorCheckpoint.getSpawnLocation() : null;
-            hasAnchorSpawn = anchorSpawn != null && anchorSpawn.getWorld() != null;
-        } else {
-            // if anchor is not lit, we should ignore it for respawn purposes
-            anchorCheckpoint = null;
-        }
-
-        RespawnResult respawnResult = determineRespawnLocation(
-            closestCheckpoint,
-            bedSpawn,
-            hasBedSpawn,
-            anchorCheckpoint,
-            anchorSpawn,
-            hasAnchorSpawn,
-            deathLocation,
-            configManager.getRespawnPriority(),
-            checkpointRadius
+        // Select best option
+        RespawnOption respawnResult = determineRespawnLocation(
+            spawnAtCheckpoint, spawnAtAnchor, spawnAtBed, deathLocation,
+            configManager.getRespawnPriority()
         );
 
         if (respawnResult == null || respawnResult.location == null) {
@@ -387,15 +367,13 @@ public final class CheckpointListener implements Listener {
 
         final boolean usedCheckpoint = respawnResult.isCheckpoint;
         final boolean usedBed = respawnResult.isBed;
+        final boolean usedAnchor = respawnResult.isAnchor;
         final boolean extinguished = respawnResult.isCheckpoint && configManager.isExtinguishOnRespawn();
-
-        final @Nullable Checkpoint respawnCheckpoint = respawnResult.checkpoint;
-        final boolean anchor = respawnCheckpoint != null && respawnCheckpoint.isAnchor();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
                 if (usedCheckpoint) {
-                    if (anchor) {
+                    if (usedAnchor) {
                         MessageUtil.send(player, "&aYou respawned at your respawn anchor!");
                     } else {
                         MessageUtil.send(player, "&aYou respawned at your campfire checkpoint!");
@@ -413,142 +391,45 @@ public final class CheckpointListener implements Listener {
     /**
      * Determines the respawn location based on priority settings
      */
-    private @Nullable RespawnResult determineRespawnLocation(
-            @Nullable Checkpoint checkpoint,
-            @Nullable Location bedSpawn,
-            boolean hasBedSpawn,
-            @Nullable Checkpoint anchorCheckpoint,
-            @Nullable Location anchorSpawn,
-            boolean hasAnchorSpawn,
+    private @Nullable RespawnOption determineRespawnLocation(
+            final @NotNull RespawnOption checkpointSpawn,
+            final @NotNull RespawnOption anchorSpawn,
+            final @NotNull RespawnOption bedSpawn,
             @NotNull Location deathLocation,
-            @NotNull RespawnPriority priority,
-            double checkpointRadius) {
+            @NotNull RespawnPriority priority) {
 
-        // Get checkpoint spawn location if available
-        Location checkpointSpawn = null;
-        boolean hasValidCheckpoint = false;
+        boolean hasBedSpawn = bedSpawn.isValidWithinRadius(deathLocation);
+        boolean hasAnchorSpawn = anchorSpawn.isValidWithinRadius(deathLocation);
+        boolean hasValidCheckpoint = checkpointSpawn.isValidWithinRadius(deathLocation);
 
-        if (checkpoint != null) {
-            checkpointSpawn = checkpoint.getSpawnLocation();
-            hasValidCheckpoint = checkpointSpawn != null && checkpointSpawn.getWorld() != null;
+        boolean hasBedOrAnchorSpawn = hasBedSpawn || hasAnchorSpawn;
+        RespawnOption bedOrAnchorSpawn = hasAnchorSpawn ? anchorSpawn : bedSpawn;
+
+        if (!hasBedOrAnchorSpawn) {
+            return hasValidCheckpoint ? checkpointSpawn : null;
         }
 
-        // If neither is available, return null
-        if (!hasValidCheckpoint && !hasBedSpawn && !hasAnchorSpawn) {
-            return null;
+        if (!hasValidCheckpoint) {
+            return bedOrAnchorSpawn;
         }
 
-        // If only checkpoint is available
-        if (hasValidCheckpoint && !hasBedSpawn && !hasAnchorSpawn) {
-            return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-        }
-
-        // If only anchor is available
-        // If no checkpoint is available, but bed and anchor are, prioritize anchor
-        if (!hasValidCheckpoint && hasAnchorSpawn) {
-            // we have to treat anchor as a checkpoint to process its charge
-            return new RespawnResult(anchorSpawn, true, false, anchorCheckpoint);
-        }
-
-        // If only bed is available
-        if (!hasValidCheckpoint && hasBedSpawn) {
-            return new RespawnResult(bedSpawn, false, true, null);
-        }
-
-        // Several options are available - use priority setting
+        // several options available - use priority setting
         switch (priority) {
             case CHECKPOINT:
-                return new RespawnResult(checkpointSpawn, true, false, checkpoint);
+                return checkpointSpawn;
 
             case BED:
-                if (hasAnchorSpawn) {
-                    // prioritize anchor over bed anyway
-                    return new RespawnResult(anchorSpawn, true, false, anchorCheckpoint);
-                }
-                return new RespawnResult(bedSpawn, false, true, null);
+                return bedOrAnchorSpawn;
 
             case CLOSEST:
-                return determineClosestRespawn(
-                    checkpoint,
-                    checkpointSpawn,
-                    bedSpawn,
-                    anchorCheckpoint,
-                    anchorSpawn,
-                    deathLocation,
-                    checkpointRadius
-                );
+                double checkpointDistSq = checkpointSpawn.distanceSquared(deathLocation);
+                double bedOrAnchorDistSq = bedOrAnchorSpawn.distanceSquared(deathLocation);
+
+                return bedOrAnchorDistSq < checkpointDistSq ? bedOrAnchorSpawn : checkpointSpawn;
 
             default:
-                return new RespawnResult(checkpointSpawn, true, false, checkpoint);
+                return checkpointSpawn;
         }
-    }
-
-    /*
-     * Determines which respawn point is closer to death location
-     */
-    private @NotNull RespawnResult determineClosestRespawn(
-            @NotNull Checkpoint checkpoint,
-            @NotNull Location checkpointSpawn,
-            @NotNull Location bedSpawn,
-            @NotNull Checkpoint anchorCheckpoint,
-            @Nullable Location anchorSpawn,
-            @NotNull Location deathLocation,
-            double checkpointRadius) {
-
-        double checkpointDistSq = checkpoint.distanceSquared(deathLocation);
-        double bedDistSq = calculateDistanceSquared(bedSpawn, deathLocation);
-        double anchorDistSq = Double.MAX_VALUE;
-
-        if (anchorSpawn != null)
-            anchorDistSq = calculateDistanceSquared(anchorSpawn, deathLocation);
-
-        // Check if bed is in a different world
-        if (bedSpawn.getWorld() == null || !bedSpawn.getWorld().equals(deathLocation.getWorld())) {
-            // Bed is in different world, use checkpoint
-            return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-        }
-
-        // Check if anchor is in a different world
-        if (anchorSpawn.getWorld() == null || !anchorSpawn.getWorld().equals(deathLocation.getWorld())) {
-            // Anchor is in different world, use checkpoint
-            return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-        }
-
-        // Check if bed is within radius
-        double radiusSquared = checkpointRadius * checkpointRadius;
-        boolean bedWithinRadius = bedDistSq <= radiusSquared;
-        boolean anchorWithinRadius = anchorDistSq <= radiusSquared;
-
-        // If bed is not within radius, use checkpoint
-        if (!bedWithinRadius && !anchorWithinRadius) {
-            return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-        }
-
-        boolean bedOrAnchorCloser = bedDistSq < anchorDistSq;
-        Location closerBedAnchorSpawn = bedOrAnchorCloser ? bedSpawn : anchorSpawn;
-        Checkpoint closerBedAnchorCheckpoint = bedOrAnchorCloser ? null : anchorCheckpoint;
-        double closerBedAnchorDistSq = Math.min(bedDistSq, anchorDistSq);
-
-        // Both are within radius, use the closer one
-        if (checkpointDistSq <= closerBedAnchorDistSq) {
-            return new RespawnResult(checkpointSpawn, true, false, checkpoint);
-        } else {
-            return new RespawnResult(closerBedAnchorSpawn, false, true, closerBedAnchorCheckpoint);
-        }
-    }
-
-    private double calculateDistanceSquared(@NotNull Location a, @NotNull Location b) {
-        if (a.getWorld() == null || b.getWorld() == null) {
-            return Double.MAX_VALUE;
-        }
-        if (!a.getWorld().equals(b.getWorld())) {
-            return Double.MAX_VALUE;
-        }
-
-        double dx = a.getX() - b.getX();
-        double dy = a.getY() - b.getY();
-        double dz = a.getZ() - b.getZ();
-        return dx * dx + dy * dy + dz * dz;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -629,18 +510,107 @@ public final class CheckpointListener implements Listener {
         }
     }
 
-    private static final class RespawnResult {
+    private static final class RespawnOption {
         final @Nullable Location location;
+        final @Nullable Checkpoint checkpoint;
         final boolean isCheckpoint;
         final boolean isBed;
-        final @Nullable Checkpoint checkpoint;
+        final boolean isAnchor;
+        final boolean valid;
+        final double radiusSq;
+        private final ConfigManager configManager;
 
-        RespawnResult(@Nullable Location location, boolean isCheckpoint, boolean isBed,
-                      @Nullable Checkpoint checkpoint) {
+        RespawnOption(@Nullable Location location, @Nullable Checkpoint checkpoint,
+                      boolean isCheckpoint, boolean isBed, boolean valid, @NotNull ConfigManager configManager) {
             this.location = location;
+            this.checkpoint = checkpoint;
             this.isCheckpoint = isCheckpoint;
             this.isBed = isBed;
+            this.valid = valid;
+            this.configManager = configManager;
+
+            this.isAnchor = isCheckpoint && checkpoint != null && checkpoint.isAnchor();
+            this.radiusSq = calcRadiusSq();
+        }
+
+        RespawnOption(@Nullable Checkpoint checkpoint, @NotNull ConfigManager configManager) {
+            this.configManager = configManager;
+            if (checkpoint == null || !checkpoint.isLit()) {
+                this.location = null;
+                this.checkpoint = checkpoint;
+                this.isCheckpoint = true;
+                this.isBed = false;
+                this.valid = false;
+                this.isAnchor = false;
+                this.radiusSq = 0;
+                return;
+            }
+
+            this.location = checkpoint.getSpawnLocation();
             this.checkpoint = checkpoint;
+            this.isCheckpoint = true;
+            this.isBed = false;
+            this.valid = location != null && location.getWorld() != null;
+
+            this.isAnchor = checkpoint.isAnchor();
+            this.radiusSq = calcRadiusSq();
+        }
+
+        private double calcRadiusSq() {
+            if (isBed || isAnchor) {
+                return Double.MAX_VALUE;
+            }
+            if (!isCheckpoint) {
+                // neither a bed, an anchor nor a checkpoint, return 0 radius just in case
+                return 0;
+            }
+
+            double radius;
+            if (checkpoint != null && checkpoint.isSoul()) {
+                radius = configManager.getSoulRadius();
+            } else {
+                radius = configManager.getRadius();
+            }
+            return radius * radius;
+        }
+
+        public boolean isValid() {
+            if (!valid) {
+                return false;
+            }
+            if (location == null || location.getWorld() == null) {
+                return false;
+            }
+            if (isCheckpoint && checkpoint == null) {
+                return false;
+            }
+            return true;
+        }
+
+        public boolean isValidWithinRadius(@NotNull Location other) {
+            if (!this.isValid()) {
+                return false;
+            }
+            if (radiusSq == Double.MAX_VALUE) {
+                // if it is an anchor or a bed, radiusSq is Double.MAX_VALUE
+                return true;
+            }
+            // if the dimensions differ, distanceSquared returns Double.MAX_VALUE
+            return distanceSquared(other) <= radiusSq;
+        }
+
+        public double distanceSquared(@NotNull Location other) {
+            if (!this.isValid() || other.getWorld() == null) {
+                return Double.MAX_VALUE;
+            }
+            if (!location.getWorld().equals(other.getWorld())) {
+                return Double.MAX_VALUE;
+            }
+
+            double dx = location.getX() - other.getX();
+            double dy = location.getY() - other.getY();
+            double dz = location.getZ() - other.getZ();
+            return dx * dx + dy * dy + dz * dz;
         }
     }
 
