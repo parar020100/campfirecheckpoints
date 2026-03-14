@@ -17,7 +17,7 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <build_name></build_name>  <!-- Пустое значение по умолчанию -->
+        <build_name></build_name>  <!-- Empty by default -->
     </properties>
 
     <repositories>
