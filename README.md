@@ -61,6 +61,7 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 `enable-regular-overworld`,  
 `enable-regular-nether`,  
 `enable-regular-end` - whether campfire checkpoints work in dimensions  
+
 `enable-soul-overworld`,  
 `enable-soul-nether`,  
 `enable-soul-end` - same for soul campfires  
@@ -70,7 +71,7 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 `min-distance`,
 `soul-campfire-min-distance` - minimal distance between checkpoints  
 
-`respawn-priority` - priority when both bed / anchor spawn and campfire checkpoint are available within radius (`checkpoint` / `bed` / `closest`)  
+`respawn-priority` - priority when both bed / anchor spawn and campfire checkpoint are within radius (`checkpoint` / `bed` / `closest`)  
 
 `require-empty-hand-or-sneak` - requires sneaking or empty hand to set checkpoints, **allows cooking**  
 
