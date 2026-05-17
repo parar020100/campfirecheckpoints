@@ -12,7 +12,7 @@ else
     test_number=1
 fi
 
-mvn package -Dbuild_name="-test$test_number"
+mvn package -Dbuild_name="-build$test_number"
 
 
 if [ $? -eq 0 ]; then
