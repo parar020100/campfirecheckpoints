@@ -44,8 +44,8 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 - 🚫 an option to disable the `/cc delete` command, forcing players to break checkpoints manually  
 
 🔧 Fixes and behaviour tweaks:  
-- `override-confirmation-timeout` option can be set to 0, forbidding the player to override existing non-broken campfires  
-- errors due to missing / invalid / extinguished ones fixed (now rescans all checkpoints during `/cc list` and before respawn)  
+- `override-confirmation-timeout` option can be set to 0, forbidding to override existing non-broken campfires  
+- errors due to missing / invalid / extinguished ones fixed (now checks all checkpoints before respawn)  
 
 
 ## Commands  
@@ -88,8 +88,8 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 
 `enable-respawn-anchors` - override respawn anchors to function like checkpoints
 
-`enable-respawn-anchors-overworld`
-`enable-respawn-anchors-nether`
+`enable-respawn-anchors-overworld`,  
+`enable-respawn-anchors-nether`,  
 `enable-respawn-anchors-end` - per-dimension overrides for respawn anchors  
 
 `vanilla-respawn-anchors-in-nether` - vanilla respawn anchor mechanics in the nether
@@ -97,11 +97,11 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 
 ## Permissions
 
-`campfirecheckpoints.use` - Create and use checkpoints - Everyone
-`campfirecheckpoints.reload` - Reload plugin config - OP
-`campfirecheckpoints.admin` - Full admin access - OP
+`campfirecheckpoints.use` - Create and use checkpoints - Everyone  
+`campfirecheckpoints.reload` - Reload plugin config - OP  
+`campfirecheckpoints.admin` - Full admin access - OP  
 
 
 ## Contacts and support
-original creator: fbikitty (Discord)
-fork developer: parar020100 (Discord, Telegram)
+**original creator**: fbikitty (Discord)  
+**fork developer**: parar020100 (Discord, Telegram)  
