@@ -33,20 +33,19 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 ⚓️ Support for respawn anchors to use campfire mechanics  
 - 🔅 can be enabled to work in all dimentions (configurable)  
 - 🛌 anchors no longer override bed spawnpoints  
-- 📏 unlimited by distance  
+- ♾️ unlimited by distance  
 - 👤 1 anchor per player  
 
 
 ⚙️ More configurable options:  
-- per-dimention toggle for campfires
-- separate per-dimention toggle for soul campfires
-- separate radius options for regular and soul campfires (soul campfires can work with more distance)
-- separate `max-distance` option, specifying minimal distance between campfires (can be different from the radius), and `soul-campfire-max-distance` for soul campfires  
-- `allow-delete-command` option, when set to false, disables the /cc delete command, forcing players to break checkpoints manually
+- 📍 per-dimention toggles for campfires and soul campfires (separately)  
+- 🔘 separate radius options for regular and soul campfires (soul campfires can work with more distance)  
+- 📏 minimal distance between campfires **can be different from the radius** (exists for both regular and soul campfires)  
+- 🚫 an option to disable the `/cc delete` command, forcing players to break checkpoints manually  
 
 🔧 Fixes and behaviour tweaks:  
-- `override-confirmation-timeout` option can be set to 0, forbidding the player to override existing non-broken campfires
-- rescan checkpoints during /cc list command and before respawn (removes errors due to missing / invalid / extinguished ones)
+- `override-confirmation-timeout` option can be set to 0, forbidding the player to override existing non-broken campfires  
+- errors due to missing / invalid / extinguished ones fixed (now rescans all checkpoints during `/cc list` and before respawn)  
 
 
 ## Commands  
