@@ -59,23 +59,28 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 
 ## Configuration
 
-`enable-regular-overworld`, `enable-regular-nether`, `enable-regular-end` - whether campfire checkpoints work in dimensions  
-`enable-soul-overworld`, `enable-soul-nether`, `enable-soul-end` - same for soul campfires
+`enable-regular-overworld`,  
+`enable-regular-nether`,  
+`enable-regular-end` - whether campfire checkpoints work in dimensions  
+`enable-soul-overworld`,  
+`enable-soul-nether`,  
+`enable-soul-end` - same for soul campfires  
 
-`radius`, `soul-campfire-radius` - how far from death to search for checkpoints  
-`min-distance`, `soul-campfire-min-distance` - minimal distance between checkpoints  
-
-`extinguish-on-respawn` - whether respawn extinguishes the campfire
-
-`override-confirmation-timeout` - seconds to confirm replacing a checkpoint (can be 0 to disable overriding)  
-
-`max-checkpoints-per-player` - limit checkpoint count (0 = unlimited)  
+`radius`,
+`soul-campfire-radius` - how far from death to search for checkpoints  
+`min-distance`,
+`soul-campfire-min-distance` - minimal distance between checkpoints  
 
 `respawn-priority` - priority when both bed / anchor spawn and campfire checkpoint are available within radius (`checkpoint` / `bed` / `closest`)  
 
-`sound-on-set`,  `sound-on-respawn` - sound effects  
+`require-empty-hand-or-sneak` - requires sneaking or empty hand to set checkpoints, **allows cooking**  
 
-`require-empty-hand-or-sneak` - requires sneaking or empty hand to set checkpoints, allows cooking  
+`extinguish-on-respawn` - whether respawn extinguishes the campfire  
+`override-confirmation-timeout` - seconds to confirm replacing a checkpoint (can be 0 to disable overriding)  
+`max-checkpoints-per-player` - limit checkpoint count (0 = unlimited)  
+
+`sound-on-set`,  
+`sound-on-respawn` - sound effects  
 
 `allow-delete-command` - toggles the `/cc delete` command
 
@@ -83,7 +88,9 @@ Right-click any lit campfire to set it as your checkpoint. When you die within r
 
 `enable-respawn-anchors` - override respawn anchors to function like checkpoints
 
-`enable-respawn-anchors-overworld`, `enable-respawn-anchors-nether`, `enable-respawn-anchors-end` - per-dimension overrides for respawn anchors  
+`enable-respawn-anchors-overworld`
+`enable-respawn-anchors-nether`
+`enable-respawn-anchors-end` - per-dimension overrides for respawn anchors  
 
 `vanilla-respawn-anchors-in-nether` - vanilla respawn anchor mechanics in the nether
 
